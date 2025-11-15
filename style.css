@@ -742,37 +742,35 @@ body {
     opacity: 0.3;
 }
 
+/* ★修正：CSS Gridで日付とゴミ箱を配置 */
 .day-header-flex {
-    display: flex;
+    display: grid;
+    /* 左(追加ボタン用), 中央(日付), 右(ゴミ箱) */
+    grid-template-columns: 30px 1fr 30px; 
     align-items: flex-start; 
-    justify-content: flex-start; 
     width: 100%;
     margin-bottom: 0.5rem;
-    position: relative; 
-    height: 36px; 
+    min-height: 1.5rem; /* 日付の高さ確保 */
 }
 
 .day-number {
     font-weight: 700;
     font-size: 1.5rem;
-    width: 100%;
+    grid-column: 2 / 3; /* グリッドの中央 */
     text-align: center;
-    position: absolute; 
-    left: 50%;
-    transform: translateX(-50%);
     z-index: 1;
 }
 
 .garbage-icons {
+    grid-column: 3 / 4; /* グリッドの右側 */
     display: flex;
     flex-direction: column; 
     gap: 2px;
     flex-wrap: wrap; 
-    position: absolute;
-    top: 0;
-    right: 0;
     align-items: flex-end; 
     z-index: 2;
+    /* ★修正：右端から少し離す */
+    padding-right: 4px; 
 }
 
 .garbage-item {
@@ -928,17 +926,7 @@ body {
     opacity: 0.3;
 }
 
-/* ★新機能：X Timeline Widget スタイル (V6には無かったものを追加) */
-.twitter-widget-full .widget-header i {
-    color: #00d4ff; /* X (Twitter) Blue / Neon Blue */
-}
-
-.twitter-container {
-    display: grid;
-    /* 横に3列、最小300pxで自動調整 */
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: var(--spacing-md);
-}
+/* X Timeline Widget スタイルは削除 (V6に戻す) */
 
 
 /* ========================================
@@ -1453,9 +1441,5 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     }
     .garbage-icon {
         font-size: 0.9rem; 
-    }
-
-    .twitter-container {
-        grid-template-columns: 1fr;
     }
 }
