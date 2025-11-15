@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zepome's Portal</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">
+                <i class="fas fa-rocket"></i>
+                Zepome's Portal
+            </h1>
+            
+            <div class="header-right">
+                <div class="header-weather">
+                    <div class="weather-tabs-mini">
+                        <button class="tab-btn-mini active" data-location="shiga">滋賀</button>
+                        <button class="tab-btn-mini" data-location="osaka">大阪</button>
+                        <button class="tab-btn-mini" data-location="tokyo">東京</button>
+                    </div>
+                    <div id="weatherContentMini" class="weather-content-mini">
+                        <i class="fas fa-cloud weather-icon"></i>
+                        <span class="weather-mini-text">Loading...</span>
+                    </div>
+                </div>
+                
+                <div class="header-timer">
+                    <div class="timer-switch-mini">
+                        <button id="timerBtnMini" class="switch-btn-mini active">タイマー</button>
+                        <button id="stopwatchBtnMini" class="switch-btn-mini">SW</button>
+                    </div>
+                    <div class="timer-display-mini" id="timerDisplayMini">00:00:00.0</div>
+                    <div class="timer-controls-mini">
+                        <button id="timerStartMini" class="control-btn-mini">▶</button>
+                        <button id="timerResetMini" class="control-btn-mini">↻</button>
+                    </div>
+                </div>
+                
+                <div class="header-info">
+                    <div class="datetime-container">
+                        <div id="currentDate" class="current-date"></div>
+                        <div id="currentTime" class="current-time">
+                            <i class="fas fa-clock"></i>
+                            <span id="timeDisplay"></span>
+                        </div>
+                    </div>
+                    <a href="https://mail.google.com/mail/u/0/#inbox" target="_blank" id="gmailCount" class="gmail-count">
+                        <i class="fas fa-envelope"></i>
+                        <span id="unreadCount">0</span>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <div class="widget todo-widget-full">
+            <div class="widget-header">
+                <h2><i class="fas fa-tasks"></i> Todo リスト</h2>
+                <div class="todo-controls">
+                    <div class="sort-dropdown">
+                        <button id="sortBtn" class="sort-btn">
+                            <i class="fas fa-filter"></i> ソート
+                        </button>
+                        <div id="sortMenu" class="sort-menu" style="display: none;">
+                            <button class="sort-option active" data-sort="all"><i class="fas fa-list"></i> 全て</button>
+                            <button class="sort-option" data-sort="time"><i class="fas fa-clock"></i> 時間順</button>
+                            <button class="sort-option" data-sort="group"><i class="fas fa-folder"></i> グループ別</button>
+                            <button class="sort-option" data-sort="day"><i class="fas fa-calendar-day"></i> 日別</button>
+                            <button class="sort-option" data-sort="month"><i class="fas fa-calendar"></i> 月別</button>
+                            <button class="sort-option" data-sort="morning"><i class="fas fa-sun"></i> 朝 (6-11時)</button>
+                            <button class="sort-option" data-sort="afternoon"><i class="fas fa-cloud-sun"></i> 昼 (12-17時)</button>
+                            <button class="sort-option" data-sort="evening"><i class="fas fa-moon"></i> 夜 (18-23時)</button>
+                        </div>
+                    </div>
+                    <button id="addTodoBtn" class="add-btn">
+                        <i class="fas fa-plus"></i> 追加
+                    </button>
+                </div>
+            </div>
+            <div id="todoList" class="todo-list-horizontal">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+
+        <div class="widget calendar-widget-full">
+            <div class="widget-header">
+                <h2><i class="fas fa-calendar-alt"></i> カレンダー</h2>
+                <div class="calendar-nav">
+                    <button id="openGarbageModalBtn" class="add-btn" style="background: var(--neon-orange);">
+                        <i class="fas fa-trash-alt"></i> ゴミの日設定
+                    </button>
+                    <button id="prevMonth" class="nav-btn"><i class="fas fa-chevron-left"></i></button>
+                    <span id="currentMonth" class="current-month"></span>
+                    <button id="nextMonth" class="nav-btn"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+            <div id="calendarGrid" class="calendar-grid"></div>
+        </div>
+
+        <div class="widget spreadsheet-widget-full">
+            <div class="widget-header">
+                <h2><i class="fas fa-table"></i> スプレッドシート</h2>
+                <button id="addSheetBtn" class="add-btn">
+                    <i class="fas fa-plus"></i> 追加
+                </button>
+            </div>
+            <div class="sheet-tabs" id="sheetTabs"></div>
+            <div id="sheetContent" class="sheet-content">
+                <div class="empty-state">
+                    <i class="fas fa-table"></i>
+                    <p>スプレッドシートを追加してください</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="timerSettingsModal" class="modal">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h3><i class="fas fa-clock"></i> タイマー設定</h3>
+                <button class="close-btn" id="closeTimerSettings">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="time-inputs">
+                    <select id="timerHours">
+                        <option value="0">00</option>
+                        <option value="1">01</option>
+                        <option value="2">02</option>
+                        <option value="3">03</option>
+                        <option value="4">04</option>
+                        <option value="5">05</option>
+                        <option value="6">06</option>
+                        <option value="7">07</option>
+                        <option value="8">08</option>
+                        <option value="9">09</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="21">21</option>
+                        <option value="22">22</option>
+                        <option value="23">23</option>
+                    </select>
+                    <span>:</span>
+                    <select id="timerMinutes">
+                        <option value="0">00</option>
+                        <option value="1">01</option>
+                        <option value="2">02</option>
+                        <option value="3">03</option>
+                        <option value="4">04</option>
+                        <option value="5" selected>05</option>
+                        <option value="6">06</option>
+                        <option value="7">07</option>
+                        <option value="8">08</option>
+                        <option value="9">09</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="25">25</option>
+                        <option value="30">30</option>
+                        <option value="35">35</option>
+                        <option value="40">40</option>
+                        <option value="45">45</option>
+                        <option value="50">50</option>
+                        <option value="55">55</option>
+                    </select>
+                    <span>:</span>
+                    <select id="timerSeconds">
+                        <option value="0" selected>00</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="30">30</option>
+                        <option value="40">40</option>
+                        <option value="45">45</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="setTimer" class="btn-primary">設定</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="todoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-tasks"></i> Todoを追加</h3>
+                <button class="close-btn" id="closeTodoModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>タスク名</label>
+                    <input type="text" id="todoTitle" placeholder="タスク名を入力">
+                </div>
+                <div class="form-group">
+                    <label>グループ</label>
+                    <div style="display: flex; gap: 10px;">
+                        <select id="todoGroup" style="flex: 1;">
+                            <option value="">グループを選択</option>
+                            <option value="__new__">+ 新しいグループを作成</option>
+                        </select>
+                        <button id="manageGroupsBtn" class="btn-secondary" style="padding: 0.5rem 1rem;">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-calendar calendar-icon" id="calendarIconBtn" style="cursor: pointer;"></i> 日程
+                    </label>
+                    <input type="text" id="todoDueDate" readonly placeholder="日程を選択">
+                    <div id="inlineCalendar" class="inline-calendar" style="display: none;"></div>
+                </div>
+                <div class="form-group">
+                    <label>時間</label>
+                    <select id="todoTime">
+                        <option value="">時間を選択</option>
+                        <option value="00:00">00:00</option>
+                        <option value="01:00">01:00</option>
+                        <option value="02:00">02:00</option>
+                        <option value="03:00">03:00</option>
+                        <option value="04:00">04:00</option>
+                        <option value="05:00">05:00</option>
+                        <option value="06:00">06:00</option>
+                        <option value="07:00">07:00</option>
+                        <option value="08:00">08:00</option>
+                        <option value="09:00">09:00</option>
+                        <option value="10:00">10:00</option>
+                        <option value="11:00">11:00</option>
+                        <option value="12:00">12:00</option>
+                        <option value="13:00">13:00</option>
+                        <option value="14:00">14:00</option>
+                        <option value="15:00">15:00</option>
+                        <option value="16:00">16:00</option>
+                        <option value="17:00">17:00</option>
+                        <option value="18:00">18:00</option>
+                        <option value="19:00">19:00</option>
+                        <option value="20:00">20:00</option>
+                        <option value="21:00">21:00</option>
+                        <option value="22:00">22:00</option>
+                        <option value="23:00">23:00</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>メモ</label>
+                    <textarea id="todoNotes" rows="3" placeholder="メモ(任意)"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelTodo" class="btn-secondary">キャンセル</button>
+                <button id="saveTodo" class="btn-primary">保存</button>
+                <button id="updateTodo" class="btn-primary" style="display: none;">更新</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="groupModal" class="modal">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h3><i class="fas fa-folder"></i> グループ管理</h3>
+                <button class="close-btn" id="closeGroupModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <ul id="groupList" class="group-list">
+                    </ul>
+            </div>
+            <div class="modal-footer">
+                <button id="doneGroupModal" class="btn-primary">完了</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="garbageModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-trash-alt"></i> ゴミの日設定</h3>
+                <button class="close-btn" id="closeGarbageModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>ゴミの種類</label>
+                    <select id="garbageType">
+                        <option value="古紙">古紙</option>
+                        <option value="焼却">焼却</option>
+                        <option value="陶器">陶器</option>
+                        <option value="プラ">プラ</option>
+                        <option value="ペット">ペット</option>
+                        <option value="缶">缶</option>
+                        <option value="ビン">ビン</option>
+                        <option value="破砕">破砕</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>繰り返しの設定</label>
+                    <select id="garbageRepeatType">
+                        <option value="none">繰り返しなし</option>
+                        <option value="weekly">毎週</option>
+                        <option value="monthly-date">毎月 (日付指定)</option>
+                        <option value="monthly-day">毎月 (曜日指定)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>日付</label>
+                    <input type="date" id="garbageDate">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="saveGarbage" class="btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="sheetModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-table"></i> スプレッドシートを追加</h3>
+                <button class="close-btn" id="closeSheetModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>シート名</label>
+                    <input type="text" id="sheetName" placeholder="例: 家計簿">
+                </div>
+                <div class="form-group">
+                    <label>スプレッドシートURL</label>
+                    <input type="text" id="sheetUrl" placeholder="GoogleスプレッドシートのURLを貼り付け">
+                    <small>フルURLを貼り付けると自動的にIDを抽出します</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelSheet" class="btn-secondary">キャンセル</button>
+                <button id="saveSheet" class="btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+    
+    <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+    <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
+</body>
+</html>

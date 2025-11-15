@@ -1,0 +1,1227 @@
+/* ========================================
+   Zepome's Portal - Final Layout
+   ======================================== */
+
+   :root {
+    /* Dark Mode Colors */
+    --bg-primary: #0a0e27;
+    --bg-secondary: #151932;
+    --bg-tertiary: #1e2139;
+    --bg-hover: #252945;
+    
+    /* Neon Accent Colors */
+    --neon-blue: #00d4ff;
+    --neon-purple: #b84fff;
+    --neon-pink: #ff006e;
+    --neon-green: #00ff88;
+    --neon-yellow: #ffee00;
+    --neon-orange: #ff9500;
+    
+    /* Text Colors */
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0c0;
+    --text-muted: #6b6b8e;
+    
+    /* Functional Colors */
+    --success: #00ff88;
+    --warning: #ffee00;
+    --danger: #ff006e;
+    --info: #00d4ff;
+    
+    /* Shadows */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+    --glow-blue: 0 0 20px rgba(0, 212, 255, 0.5);
+    --glow-purple: 0 0 20px rgba(184, 79, 255, 0.5);
+    
+    /* Spacing */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 3rem;
+    
+    /* Border Radius */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+
+    /* ★新機能：Garbage Colors */
+    --garbage-koshi: rgba(255, 253, 208, 0.7); /* 淡い黄色 */
+    --garbage-shokyaku: rgba(255, 204, 153, 0.7); /* 淡いオレンジ */
+    --garbage-toki: rgba(255, 179, 179, 0.7); /* 淡い赤 */
+    --garbage-pura: rgba(255, 204, 229, 0.7); /* 淡いピンク */
+    --garbage-petto: rgba(204, 255, 204, 0.7); /* 淡い緑 */
+    --garbage-kan: rgba(211, 211, 211, 0.7); /* 淡い灰色 */
+    --garbage-bin: rgba(204, 255, 255, 0.7); /* 淡い水色 */
+    --garbage-hasai: rgba(230, 204, 255, 0.7); /* 淡い紫 */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #2a2a2a;
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1920px;
+    margin: 0 auto;
+    padding: var(--spacing-md);
+}
+
+/* ========================================
+   Header - With Weather & Timer
+   ======================================== */
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-md);
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    gap: var(--spacing-md);
+    flex-wrap: nowrap;
+    height: 80px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-left: auto;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    white-space: nowrap;
+}
+
+.logo i {
+    background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Header Weather Mini */
+.header-weather {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    background: var(--bg-tertiary);
+    padding: 0.5rem var(--spacing-sm);
+    border-radius: var(--radius-md);
+    min-width: 280px;
+}
+
+.weather-tabs-mini {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.tab-btn-mini {
+    padding: 0.3rem 0.6rem;
+    background: var(--bg-primary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.75rem;
+}
+
+.tab-btn-mini:hover {
+    border-color: var(--neon-blue);
+    color: var(--neon-blue);
+}
+
+.tab-btn-mini.active {
+    background: linear-gradient(135deg, var(--neon-purple) 0%, var(--neon-pink) 100%);
+    color: white;
+    border-color: var(--neon-purple);
+}
+
+.weather-content-mini {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--neon-yellow);
+    min-width: 120px;
+}
+
+/* Header Timer Mini */
+.header-timer {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    background: var(--bg-tertiary);
+    padding: 0.5rem var(--spacing-sm);
+    border-radius: var(--radius-md);
+    min-width: 280px;
+}
+
+.timer-switch-mini {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.switch-btn-mini {
+    padding: 0.3rem 0.5rem;
+    background: var(--bg-primary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.7rem;
+}
+
+.switch-btn-mini:hover {
+    color: var(--neon-purple);
+}
+
+.switch-btn-mini.active {
+    background: var(--neon-purple);
+    color: white;
+    border-color: var(--neon-purple);
+}
+
+.timer-display-mini {
+    font-size: 0.9rem;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    color: var(--neon-green);
+    min-width: 90px;
+    cursor: pointer;
+}
+
+.timer-display-mini:hover {
+    color: var(--neon-blue);
+}
+
+.timer-controls-mini {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.control-btn-mini {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background: var(--bg-primary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-sm);
+    color: var(--neon-green);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.control-btn-mini:hover {
+    background: var(--neon-green);
+    color: var(--bg-primary);
+}
+
+.header-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    min-width: 220px;
+}
+
+.datetime-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    align-items: flex-start;
+}
+
+.current-date {
+    font-size: 1rem;
+    font-weight: 500;
+    color: white;
+    opacity: 0.9;
+}
+
+.current-time {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: white;
+    min-width: 160px;
+}
+
+.current-time i {
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+}
+
+.current-time #timeDisplay {
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.05em;
+}
+
+.gmail-count {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: 0.4rem var(--spacing-sm);
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--neon-pink);
+    box-shadow: 0 0 15px rgba(255, 0, 110, 0.3);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.gmail-count:hover {
+    background: var(--bg-hover);
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(255, 0, 110, 0.5);
+}
+
+.gmail-count i {
+    color: var(--neon-pink);
+    font-size: 1rem;
+}
+
+.gmail-count span {
+    font-weight: 700;
+    color: var(--neon-pink);
+    font-size: 1rem;
+}
+
+/* ========================================
+   Widget Base Styles
+   ======================================== */
+
+.widget {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+    margin-bottom: var(--spacing-md);
+}
+
+.widget:hover {
+    border-color: rgba(0, 212, 255, 0.3);
+    box-shadow: var(--shadow-lg), var(--glow-blue);
+}
+
+.widget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--bg-tertiary);
+}
+
+.widget-header h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    color: var(--text-primary);
+}
+
+.widget-header i {
+    color: var(--neon-blue);
+    text-shadow: var(--glow-blue);
+}
+
+/* ========================================
+   Todo Widget - Full Width
+   ======================================== */
+
+.todo-widget-full {
+    min-height: 150px;
+}
+
+.todo-list-horizontal {
+    display: flex;
+    gap: var(--spacing-sm);
+    overflow-x: auto;
+    padding: var(--spacing-sm);
+    background: #3a3a3a;
+    border-radius: var(--radius-sm);
+}
+
+.todo-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-sm);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    min-width: 250px;
+    flex-shrink: 0;
+}
+
+.todo-item:hover {
+    background: var(--bg-hover);
+    border-color: rgba(184, 79, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.todo-checkbox {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    cursor: pointer;
+    accent-color: var(--neon-purple);
+    flex-shrink: 0;
+}
+
+.todo-content {
+    flex: 1;
+}
+
+.todo-title {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    font-size: 1.1rem;
+}
+
+.todo-meta {
+    display: flex;
+    gap: var(--spacing-xs);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+    flex-wrap: wrap;
+}
+
+.todo-group {
+    color: var(--neon-orange);
+}
+
+.todo-due {
+    color: var(--neon-yellow);
+}
+
+.todo-time {
+    color: var(--neon-green);
+}
+
+.todo-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.todo-edit,
+.todo-delete {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    padding: 0.25rem;
+}
+
+.todo-edit:hover {
+    color: var(--neon-blue);
+}
+
+.todo-delete:hover {
+    color: var(--danger);
+}
+
+.todo-item.completed .todo-title {
+    text-decoration: line-through;
+    opacity: 0.5;
+}
+
+.todo-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.sort-dropdown {
+    position: relative;
+}
+
+.sort-btn {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--bg-tertiary);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    border-radius: var(--radius-sm);
+    color: var(--neon-blue);
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.sort-btn:hover {
+    background: var(--bg-hover);
+    border-color: var(--neon-blue);
+    box-shadow: var(--glow-blue);
+}
+
+.sort-menu {
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    background: var(--bg-secondary);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-lg);
+    min-width: 180px;
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.sort-option {
+    width: 100%;
+    padding: var(--spacing-sm);
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    text-align: left;
+}
+
+.sort-option:hover {
+    background: var(--bg-hover);
+    color: var(--neon-blue);
+}
+
+.sort-option.active {
+    background: var(--bg-hover);
+    color: var(--neon-purple);
+    font-weight: 600;
+}
+
+.add-btn {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: linear-gradient(135deg, var(--neon-purple) 0%, var(--neon-pink) 100%);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.add-btn:hover {
+    box-shadow: 0 0 20px rgba(184, 79, 255, 0.6);
+    transform: scale(1.05);
+}
+
+/* ========================================
+   Calendar Widget - Full Width
+   ======================================== */
+
+.calendar-widget-full {
+    min-height: 600px;
+}
+
+.calendar-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    /* 変更：右寄せにするため */
+    margin-left: auto;
+}
+
+.nav-btn {
+    background: var(--bg-tertiary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-btn:hover {
+    background: var(--bg-hover);
+    border-color: var(--neon-blue);
+    color: var(--neon-blue);
+}
+
+.current-month {
+    font-size: 1.1rem;
+    font-weight: 600;
+    min-width: 150px;
+    text-align: center;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: var(--spacing-sm);
+}
+
+.calendar-day-header {
+    text-align: center;
+    padding: var(--spacing-sm);
+    font-weight: 700;
+    color: white;
+    font-size: 1.1rem;
+}
+
+.calendar-day {
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: var(--spacing-sm);
+    background: #3a3a3a;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow-y: auto;
+}
+
+.calendar-day .add-event-btn {
+    display: none;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: var(--neon-purple);
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    color: white;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.calendar-day:hover .add-event-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.calendar-day .add-event-btn:hover {
+    background: var(--neon-pink);
+    transform: scale(1.1);
+}
+
+.calendar-day:hover {
+    background: var(--bg-hover);
+    border-color: var(--neon-blue);
+    transform: scale(1.02);
+}
+
+.calendar-day.today {
+    background: rgba(255, 182, 193, 0.2);
+    border: 2px solid #ff006e;
+    box-shadow: 0 0 10px rgba(255, 0, 110, 0.3);
+}
+
+.calendar-day.other-month {
+    opacity: 0.3;
+}
+
+.day-number {
+    font-weight: 700;
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+}
+
+.day-events {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+.event-dot {
+    width: 100%;
+    padding: 5px 8px;
+    background: rgba(0, 212, 255, 0.3);
+    border-radius: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+    font-size: 0.85rem;
+    border-left: 3px solid var(--neon-blue);
+    color: var(--text-primary);
+}
+
+/* ★新機能：ゴミの日イベントのスタイル */
+.event-dot.garbage-event {
+    border-left-width: 5px;
+    font-weight: 600;
+    color: #333; /* 文字色を濃くして読みやすく */
+}
+.event-dot[data-type="古紙"] { background: var(--garbage-koshi); border-left-color: #FFEB3B; }
+.event-dot[data-type="焼却"] { background: var(--garbage-shokyaku); border-left-color: #FF9800; }
+.event-dot[data-type="陶器"] { background: var(--garbage-toki); border-left-color: #F44336; }
+.event-dot[data-type="プラ"] { background: var(--garbage-pura); border-left-color: #E91E63; }
+.event-dot[data-type="ペット"] { background: var(--garbage-petto); border-left-color: #4CAF50; }
+.event-dot[data-type="缶"] { background: var(--garbage-kan); border-left-color: #9E9E9E; }
+.event-dot[data-type="ビン"] { background: var(--garbage-bin); border-left-color: #03A9F4; }
+.event-dot[data-type="破砕"] { background: var(--garbage-hasai); border-left-color: #9C27B0; }
+
+
+/* ========================================
+   Spreadsheet Widget - Full Width
+   ======================================== */
+
+.spreadsheet-widget-full {
+    min-height: 600px;
+}
+
+.sheet-tabs {
+    display: flex;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-sm);
+    overflow-x: auto;
+    padding-bottom: var(--spacing-xs);
+}
+
+.sheet-tab {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--bg-tertiary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-size: 0.9rem;
+}
+
+.sheet-tab:hover {
+    background: var(--bg-hover);
+    border-color: var(--neon-green);
+}
+
+.sheet-tab.active {
+    background: var(--neon-green);
+    border-color: var(--neon-green);
+    color: var(--bg-primary);
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+}
+
+.sheet-tab .delete-sheet {
+    margin-left: var(--spacing-xs);
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    font-size: 0.9rem;
+}
+
+.sheet-tab .delete-sheet:hover {
+    color: var(--danger);
+}
+
+.sheet-content {
+    min-height: 1200px;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+
+.sheet-content iframe {
+    width: 100%;
+    height: 1200px;
+    border: none;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 1200px;
+    color: var(--text-muted);
+}
+
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: var(--spacing-md);
+    opacity: 0.3;
+}
+
+/* ========================================
+   Modal
+   ======================================== */
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg), 0 0 50px rgba(0, 212, 255, 0.3);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+}
+
+.modal-small {
+    max-width: 350px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-header h3 {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    color: var(--neon-blue);
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+    color: var(--danger);
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    padding: var(--spacing-md);
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ★新機能：グループ管理リスト */
+.group-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 300px;
+    overflow-y: auto;
+}
+.group-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm);
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--spacing-xs);
+    color: var(--text-primary);
+}
+.group-list .delete-group-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+.group-list .delete-group-btn:hover {
+    color: var(--danger);
+}
+
+
+/* ========================================
+   Form Elements
+   ======================================== */
+
+.form-group {
+    margin-bottom: var(--spacing-md);
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.calendar-icon {
+    color: #ffffff;
+    font-size: 1.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.calendar-icon:hover {
+    color: var(--neon-blue);
+    transform: scale(1.1);
+}
+
+/* Inline Calendar Picker */
+.inline-calendar {
+    margin-top: var(--spacing-sm);
+    background: var(--bg-tertiary);
+    padding: var(--spacing-sm);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+}
+
+.inline-calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+}
+
+.inline-calendar-header button {
+    background: var(--bg-primary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    padding: 0.3rem 0.6rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.inline-calendar-header button:hover {
+    border-color: var(--neon-blue);
+    color: var(--neon-blue);
+}
+
+.inline-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.25rem;
+}
+
+.inline-calendar-day {
+    padding: 0.5rem;
+    text-align: center;
+    background: var(--bg-primary);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+}
+
+.inline-calendar-day:hover {
+    background: var(--bg-hover);
+    color: var(--neon-blue);
+}
+
+.inline-calendar-day.today {
+    background: var(--neon-blue);
+    color: white;
+}
+
+.inline-calendar-day.selected {
+    background: var(--neon-purple);
+    color: white;
+}
+
+.inline-calendar-day.other-month {
+    opacity: 0.3;
+}
+
+.time-inputs {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    justify-content: center;
+}
+
+.time-inputs select {
+    /* 変更：inputからselectに変更されたため */
+    padding: var(--spacing-sm);
+    background: var(--bg-tertiary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    text-align: center;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.time-inputs select:focus {
+    outline: none;
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+}
+
+.time-inputs span {
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+}
+
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group input[type="time"],
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: var(--spacing-sm);
+    background: var(--bg-tertiary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-group input[readonly] {
+    cursor: pointer;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--neon-blue);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+}
+
+.form-group small {
+    display: block;
+    margin-top: var(--spacing-xs);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    cursor: pointer;
+    margin: 0;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--neon-blue);
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-purple) 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+    transform: scale(1.05);
+}
+
+.btn-secondary {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-secondary:hover {
+    background: var(--bg-hover);
+    border-color: var(--text-primary);
+}
+
+/* ========================================
+   Loading & Empty States
+   ======================================== */
+
+.loading {
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.loading::after {
+    content: '...';
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0%, 20% { content: '.'; }
+    40% { content: '..'; }
+    60%, 100% { content: '...'; }
+}
+
+/* ========================================
+   Scrollbar Styling
+   ======================================== */
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-tertiary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--neon-blue);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--neon-purple);
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
+@media (max-width: 1024px) {
+    .header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .header-weather,
+    .header-timer {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .logo {
+        font-size: 1.2rem;
+    }
+    
+    .calendar-day {
+        min-height: 80px;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: var(--spacing-sm);
+    }
+    
+    .widget {
+        padding: var(--spacing-sm);
+    }
+    
+    .todo-list-horizontal {
+        flex-direction: column;
+    }
+    
+    .todo-item {
+        min-width: 100%;
+    }
+}
