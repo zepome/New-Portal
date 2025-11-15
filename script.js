@@ -1,5 +1,5 @@
 /* ========================================
-   Zepome's Portal - V2 Script
+   Zepome's Portal - V3 Script (New Features)
    ======================================== */
 
 // グローバル変数
@@ -25,7 +25,6 @@ let spreadsheets = JSON.parse(localStorage.getItem(STORAGE_KEYS.SPREADSHEETS) ||
 let todoGroups = JSON.parse(localStorage.getItem(STORAGE_KEYS.TODO_GROUPS) || '["仕事", "個人", "買い物"]');
 let calendarEvents = [];
 let todos = JSON.parse(localStorage.getItem('portal_todos') || '[]');
-// ★新機能：ゴミの日データをLocalStorageから読み込む
 let garbageDays = JSON.parse(localStorage.getItem('portal_garbage_days') || '[]');
 
 
@@ -44,16 +43,13 @@ document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
     
     // Gmail未読数を定期的に更新（5分ごと）
-    // updateGmailCount(); // 初期認証を待つため、初回ロード時は不要
     setInterval(updateGmailCount, 300000);
     
     
-    // Google APIが設定されていれば、Gmail未読数エリアクリックで認証を開始
     if (isGoogleAPIConfigured()) {
         const gmailCountEl = document.getElementById('gmailCount');
         if (gmailCountEl) {
             gmailCountEl.addEventListener('click', (e) => {
-                // リンクのデフォルト動作（Gmailへの遷移）を常に防ぎ、認証ボタンとして機能させる
                 e.preventDefault(); 
                 console.log('Starting authentication...');
                 handleAuthClick();
@@ -70,7 +66,6 @@ function saveTodos() {
     localStorage.setItem('portal_todos', JSON.stringify(todos));
 }
 
-// ★新機能：ゴミの日データを保存
 function saveGarbageDays() {
     localStorage.setItem('portal_garbage_days', JSON.stringify(garbageDays));
 }
@@ -172,7 +167,7 @@ function setupEventListeners() {
         }
     });
 
-    // ★新機能：Todoグループ管理モーダル
+    // Todoグループ管理モーダル
     document.getElementById('manageGroupsBtn').addEventListener('click', openGroupModal);
     document.getElementById('closeGroupModal').addEventListener('click', closeGroupModal);
     document.getElementById('doneGroupModal').addEventListener('click', closeGroupModal);
@@ -180,7 +175,7 @@ function setupEventListeners() {
         if (e.target.id === 'groupModal') closeGroupModal();
     });
 
-    // ★新機能：ゴミの日モーダル
+    // ゴミの日モーダル
     document.getElementById('openGarbageModalBtn').addEventListener('click', openGarbageModal);
     document.getElementById('closeGarbageModal').addEventListener('click', closeGarbageModal);
     document.getElementById('saveGarbage').addEventListener('click', saveGarbageEvent);
@@ -502,10 +497,36 @@ function createCalendarDay(day, isOtherMonth, year, month) {
         dayEl.classList.add('today');
     }
     
+    // YYYY-MM-DD形式の文字列と、日付オブジェクトを作成
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const dateObj = new Date(year, month, day);
+
+    // ★修正：日付ヘッダーをFlexコンテナに変更
+    const dayHeaderFlex = document.createElement('div');
+    dayHeaderFlex.className = 'day-header-flex';
+    
     const dayNumber = document.createElement('div');
     dayNumber.className = 'day-number';
     dayNumber.textContent = day;
-    dayEl.appendChild(dayNumber);
+    dayHeaderFlex.appendChild(dayNumber); // Flexコンテナに追加
+
+    // ★新機能：ゴミの日アイコンコンテナ
+    const garbageIconsContainer = document.createElement('div');
+    garbageIconsContainer.className = 'garbage-icons';
+    
+    // ゴミの日イベントを取得
+    const dayGarbageEvents = getGarbageEventsForDate(dateStr, dateObj);
+    dayGarbageEvents.forEach(event => {
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-trash garbage-icon'; // Font Awesomeのゴミ箱アイコン
+        icon.dataset.type = event.title;
+        icon.title = event.title; // ホバーで名前を表示
+        garbageIconsContainer.appendChild(icon);
+    });
+    dayHeaderFlex.appendChild(garbageIconsContainer); // Flexコンテナに追加
+    
+    dayEl.appendChild(dayHeaderFlex); // 日付ヘッダーをセルに追加
+
     
     // イベント追加ボタン
     if (!isOtherMonth) {
@@ -514,41 +535,22 @@ function createCalendarDay(day, isOtherMonth, year, month) {
         addBtn.innerHTML = '<i class="fas fa-plus"></i>';
         addBtn.onclick = (e) => {
             e.stopPropagation();
-            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             openTodoModalWithDate(dateStr);
         };
         dayEl.appendChild(addBtn);
     }
     
-    // YYYY-MM-DD形式の文字列を作成
-    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    // ★修正：Todoイベントのみを取得
+    const dayTodos = getTodosForDate(dateStr);
     
-    // ★修正：Todoイベントとゴミの日イベントの両方を描画する
-    const dayEvents = getTodosForDate(dateStr);
-    const dayGarbageEvents = getGarbageEventsForDate(dateStr, new Date(year, month, day));
-
-    const allEvents = [...dayEvents, ...dayGarbageEvents].sort((a, b) => {
-        if (!a.time) return 1;
-        if (!b.time) return -1;
-        return a.time.localeCompare(b.time);
-    });
-
-    
-    if (allEvents.length > 0) {
+    if (dayTodos.length > 0) {
         const eventsContainer = document.createElement('div');
         eventsContainer.className = 'day-events';
-        allEvents.forEach(event => {
+        dayTodos.forEach(event => {
             const eventDot = document.createElement('div');
             eventDot.className = 'event-dot';
             eventDot.textContent = event.time ? `${event.time} ${event.title}` : event.title;
             eventDot.title = event.title;
-            
-            // ★新機能：ゴミの日の場合、特別なクラスと属性を付与
-            if (event.isGarbage) {
-                eventDot.classList.add('garbage-event');
-                eventDot.dataset.type = event.title;
-            }
-
             eventsContainer.appendChild(eventDot);
         });
         dayEl.appendChild(eventsContainer);
@@ -557,7 +559,7 @@ function createCalendarDay(day, isOtherMonth, year, month) {
     return dayEl;
 }
 
-// getEventsForDate を getTodosForDate にリネーム
+// Todoイベントのみを取得する
 function getTodosForDate(dateStr) {
     return todos.filter(todo => {
         if (!todo.dueDate) return false;
@@ -565,8 +567,12 @@ function getTodosForDate(dateStr) {
     }).map(todo => ({
         title: todo.title,
         time: todo.time || null,
-        isGarbage: false // Todoイベントの印
-    }));
+        isGarbage: false
+    })).sort((a, b) => { // 時間順にソート
+        if (!a.time) return 1;
+        if (!b.time) return -1;
+        return a.time.localeCompare(b.time);
+    });
 }
 
 function changeMonth(delta) {
@@ -619,7 +625,7 @@ function closeTodoModal() {
 
 function updateTodoGroupOptions() {
     const select = document.getElementById('todoGroup');
-    const currentValue = select.value; // 現在選択されている値を保持
+    const currentValue = select.value; 
     
     select.innerHTML = '<option value="">グループを選択</option>';
     
@@ -635,11 +641,10 @@ function updateTodoGroupOptions() {
     newOption.textContent = '+ 新しいグループを作成';
     select.appendChild(newOption);
 
-    // 保持した値を再設定
     if (todoGroups.includes(currentValue)) {
         select.value = currentValue;
     } else {
-        select.value = ''; // 削除されたグループが選択されていた場合はリセット
+        select.value = '';
     }
 }
 
@@ -898,12 +903,12 @@ function filterAndSortTodos(todoList, filter) {
 }
 
 /* ========================================
-   ★新機能：Todoグループ削除
+   Todoグループ削除
    ======================================== */
 
 function openGroupModal() {
     const groupList = document.getElementById('groupList');
-    groupList.innerHTML = ''; // リストを初期化
+    groupList.innerHTML = ''; 
     
     if (todoGroups.length === 0) {
         groupList.innerHTML = '<li>グループはありません</li>';
@@ -927,17 +932,14 @@ function openGroupModal() {
 
 function closeGroupModal() {
     document.getElementById('groupModal').classList.remove('active');
-    // モーダルを閉じる際に、Todoモーダルのドロップダウンを更新
     updateTodoGroupOptions();
 }
 
 function deleteGroup(groupName) {
     if (confirm(`「${groupName}」グループを削除しますか？\nこのグループに設定されているTodoは「グループなし」になります。`)) {
-        // 1. グループ配列から削除
         todoGroups = todoGroups.filter(g => g !== groupName);
         localStorage.setItem(STORAGE_KEYS.TODO_GROUPS, JSON.stringify(todoGroups));
         
-        // 2. 該当するTodoのグループをリセット
         todos.forEach(todo => {
             if (todo.group === groupName) {
                 todo.group = '';
@@ -945,19 +947,17 @@ function deleteGroup(groupName) {
         });
         saveTodos();
         
-        // 3. 表示を更新
         renderTodoList();
-        openGroupModal(); // モーダルのリストを再描画
+        openGroupModal(); 
     }
 }
 
 
 /* ========================================
-   ★新機能：ゴミの日カレンダー
+   ゴミの日カレンダー
    ======================================== */
 
 function openGarbageModal() {
-    // 今日をデフォルト日付に設定
     document.getElementById('garbageDate').value = new Date().toISOString().split('T')[0];
     document.getElementById('garbageModal').classList.add('active');
 }
@@ -992,16 +992,15 @@ function saveGarbageEvent() {
 function getGarbageEventsForDate(dateStr, dateObj) {
     const events = [];
     
-    // dateObjはカレンダー描画中の日付 / dateStrは YYYY-MM-DD
     const year = dateObj.getFullYear();
     const month = dateObj.getMonth(); // 0-11
     const date = dateObj.getDate(); // 1-31
     const dayOfWeek = dateObj.getDay(); // 0=日, 1=月, ...
 
     garbageDays.forEach(event => {
-        const startDate = new Date(event.startDate + 'T00:00:00'); // 時刻を補完
+        const startDate = new Date(event.startDate + 'T00:00:00'); 
         if (dateObj < startDate) {
-            return; // 開始日より前の日付はスキップ
+            return; 
         }
 
         const startDay = startDate.getDate();
@@ -1029,7 +1028,6 @@ function getGarbageEventsForDate(dateStr, dateObj) {
                 break;
             
             case 'monthly-day':
-                // 第N週のX曜日かをチェック
                 const weekOfMonth = Math.floor((date - 1) / 7) + 1;
                 const startWeekOfMonth = Math.floor((startDay - 1) / 7) + 1;
                 
@@ -1196,7 +1194,7 @@ function gisLoaded() {
             }
             accessToken = response.access_token;
             console.log('Access token received');
-            updateGmailCount(); // ★認証成功時にGmail未読数を取得
+            updateGmailCount(); 
         }
     });
     gisInited = true;
@@ -1207,7 +1205,6 @@ function gisLoaded() {
 function maybeEnableButtons() {
     if (gapiInited && gisInited && isGoogleAPIConfigured()) {
         console.log('Ready for Google API calls');
-        // 自動認証は行わず、ユーザーのクリックを待つ
     }
 }
 
@@ -1217,7 +1214,6 @@ function handleAuthClick() {
         return;
     }
     
-    // ★修正：常に 'consent' を発行し、キャッシュ問題を回避
     if (accessToken === null) {
         tokenClient.requestAccessToken({ prompt: 'consent' });
     } else {
@@ -1233,7 +1229,6 @@ async function updateGmailCount() {
     }
     
     try {
-        // ★修正：'main' カテゴリのみを対象にするクエリに変更
         const response = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages?labelIds=INBOX&labelIds=UNREAD&labelIds=CATEGORY_PERSONAL&maxResults=1', {
             headers: {
                 'Authorization': `Bearer ${accessToken}`
@@ -1246,7 +1241,6 @@ async function updateGmailCount() {
             document.getElementById('unreadCount').textContent = unreadCount;
             console.log('Gmail unread count updated:', unreadCount);
         } else {
-            // トークン切れなどで401エラーが出た場合、accessTokenをリセット
             if (response.status === 401) {
                 accessToken = null;
                 console.log('Access token expired or invalid. Ready for re-authentication.');
@@ -1365,5 +1359,4 @@ function addHour(timeString) {
 
 window.addEventListener('load', () => {
     renderTodoList();
-    // updateGmailCount(); // 認証クリックを待つため、ロード時は呼び出さない
 });
