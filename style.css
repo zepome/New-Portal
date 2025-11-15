@@ -683,7 +683,6 @@ body {
 .calendar-day {
     aspect-ratio: 1 / 0.9;
     height: auto; 
-
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -695,7 +694,8 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
-    overflow-y: auto;
+    /* ★修正：スクロールバー削除 */
+    overflow-y: hidden;
 }
 
 .calendar-day .add-event-btn {
@@ -745,31 +745,32 @@ body {
 /* ★修正：CSS Gridで日付とゴミ箱を配置 */
 .day-header-flex {
     display: grid;
-    /* 左(追加ボタン用), 中央(日付), 右(ゴミ箱) */
-    grid-template-columns: 30px 1fr 30px; 
+    /* 左(追加ボタン用 28px), 中央(日付), 右(ゴミ箱 自動幅) */
+    grid-template-columns: 28px 1fr auto; 
     align-items: flex-start; 
     width: 100%;
     margin-bottom: 0.5rem;
-    min-height: 1.5rem; /* 日付の高さ確保 */
+    min-height: 2.5rem; /* ゴミの日の高さ(1行分)を確保 */
 }
 
 .day-number {
     font-weight: 700;
     font-size: 1.5rem;
-    grid-column: 2 / 3; /* グリッドの中央 */
+    grid-column: 2 / 3; 
     text-align: center;
     z-index: 1;
+    padding-top: 4px; /* アイコンと被らないよう微調整 */
 }
 
 .garbage-icons {
-    grid-column: 3 / 4; /* グリッドの右側 */
+    grid-column: 3 / 4; 
     display: flex;
-    flex-direction: column; 
-    gap: 2px;
-    flex-wrap: wrap; 
-    align-items: flex-end; 
+    flex-direction: row; /* ★横並び */
+    flex-wrap: wrap; /* ★折り返し */
+    gap: 4px; 
+    align-items: flex-start; 
+    justify-content: flex-end; /* ★右寄せ */
     z-index: 2;
-    /* ★修正：右端から少し離す */
     padding-right: 4px; 
 }
 
@@ -926,9 +927,6 @@ body {
     opacity: 0.3;
 }
 
-/* X Timeline Widget スタイルは削除 (V6に戻す) */
-
-
 /* ========================================
    Modal
    ======================================== */
@@ -1037,7 +1035,7 @@ body {
     color: var(--danger);
 }
 
-/* ★新機能：ゴミの日ルール管理リスト */
+/* ゴミの日ルール管理リスト */
 #garbageRuleListContainer {
     max-height: 200px;
     overflow-y: auto;
