@@ -2,7 +2,7 @@
    Zepome's Portal - Final Layout
    ======================================== */
 
-   :root {
+:root {
     /* Dark Mode Colors */
     --bg-primary: #0a0e27;
     --bg-secondary: #151932;
@@ -48,15 +48,16 @@
     --radius-lg: 16px;
     --radius-xl: 24px;
 
-    /* ★新機能：Garbage Colors */
-    --garbage-koshi: rgba(255, 253, 208, 0.7); /* 淡い黄色 */
-    --garbage-shokyaku: rgba(255, 204, 153, 0.7); /* 淡いオレンジ */
-    --garbage-toki: rgba(255, 179, 179, 0.7); /* 淡い赤 */
-    --garbage-pura: rgba(255, 204, 229, 0.7); /* 淡いピンク */
-    --garbage-petto: rgba(204, 255, 204, 0.7); /* 淡い緑 */
-    --garbage-kan: rgba(211, 211, 211, 0.7); /* 淡い灰色 */
-    --garbage-bin: rgba(204, 255, 255, 0.7); /* 淡い水色 */
-    --garbage-hasai: rgba(230, 204, 255, 0.7); /* 淡い紫 */
+    /* Garbage Colors */
+    /* ★修正：色を濃いめにしてアイコンが見やすいように */
+    --garbage-koshi: #FFEB3B; /* 黄色 */
+    --garbage-shokyaku: #FF9800; /* オレンジ */
+    --garbage-toki: #F44336; /* 赤 */
+    --garbage-pura: #E91E63; /* ピンク */
+    --garbage-petto: #4CAF50; /* 緑 */
+    --garbage-kan: #9E9E9E; /* 灰色 */
+    --garbage-bin: #03A9F4; /* 水色 */
+    --garbage-hasai: #9C27B0; /* 紫 */
 }
 
 * {
@@ -356,6 +357,8 @@ body {
     margin-bottom: var(--spacing-md);
     padding-bottom: var(--spacing-sm);
     border-bottom: 2px solid var(--bg-tertiary);
+    /* ★修正：ヘッダー内の要素間に隙間をあける */
+    gap: var(--spacing-sm);
 }
 
 .widget-header h2 {
@@ -365,12 +368,57 @@ body {
     align-items: center;
     gap: var(--spacing-xs);
     color: var(--text-primary);
+    /* ★追加：タイトルが縮まないように */
+    flex-shrink: 0;
 }
 
 .widget-header i {
     color: var(--neon-blue);
     text-shadow: var(--glow-blue);
 }
+
+/* ========================================
+   ★新機能：Quick Links
+   ======================================== */
+.quick-links {
+    display: flex;
+    gap: var(--spacing-xs);
+    align-items: center;
+    /* ★追加：空欄を埋める */
+    flex-grow: 1;
+    justify-content: center;
+    overflow-x: auto; /* スマホで溢れたらスクロール */
+}
+
+.quick-links a {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: 0.5rem 0.8rem;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid var(--bg-tertiary);
+    white-space: nowrap;
+}
+
+.quick-links a:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+    border-color: var(--neon-blue);
+}
+
+/* アイコンの色分け */
+.quick-links a[data-icon="udemy"] i { color: #A435F0; }
+.quick-links a[data-icon="jdla"] i { color: #00AEEF; }
+.quick-links a[data-icon="ai-pass"] i { color: #f0c30e; }
+.quick-links a[data-icon="ga"] i { color: #E8710A; }
+.quick-links a[data-icon="ads"] i { color: #4285F4; }
+
 
 /* ========================================
    Todo Widget - Full Width
@@ -482,6 +530,8 @@ body {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
+    /* ★追加：縮まないように */
+    flex-shrink: 0;
 }
 
 .sort-dropdown {
@@ -580,7 +630,6 @@ body {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
-    /* 変更：右寄せにするため */
     margin-left: auto;
 }
 
@@ -684,11 +733,43 @@ body {
     opacity: 0.3;
 }
 
+/* ★修正：日付とゴミの日アイコンを横並びにするコンテナ */
+.day-header-flex {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
 .day-number {
     font-weight: 700;
     font-size: 1.3rem;
-    margin-bottom: 0.5rem;
 }
+
+/* ★新機能：ゴミの日アイコンコンテナ */
+.garbage-icons {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap; /* アイコンが多い日は折り返す */
+    flex: 1; /* 残りのスペースを埋める */
+}
+
+/* ★新機能：ゴミの日アイコン */
+.garbage-icon {
+    font-size: 1rem; /* 日付より少し小さく */
+    text-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+.garbage-icon[data-type="古紙"] { color: var(--garbage-koshi); }
+.garbage-icon[data-type="焼却"] { color: var(--garbage-shokyaku); }
+.garbage-icon[data-type="陶器"] { color: var(--garbage-toki); }
+.garbage-icon[data-type="プラ"] { color: var(--garbage-pura); }
+.garbage-icon[data-type="ペット"] { color: var(--garbage-petto); }
+.garbage-icon[data-type="缶"] { color: var(--garbage-kan); }
+.garbage-icon[data-type="ビン"] { color: var(--garbage-bin); }
+.garbage-icon[data-type="破砕"] { color: var(--garbage-hasai); }
+
 
 .day-events {
     display: flex;
@@ -713,20 +794,7 @@ body {
     color: var(--text-primary);
 }
 
-/* ★新機能：ゴミの日イベントのスタイル */
-.event-dot.garbage-event {
-    border-left-width: 5px;
-    font-weight: 600;
-    color: #333; /* 文字色を濃くして読みやすく */
-}
-.event-dot[data-type="古紙"] { background: var(--garbage-koshi); border-left-color: #FFEB3B; }
-.event-dot[data-type="焼却"] { background: var(--garbage-shokyaku); border-left-color: #FF9800; }
-.event-dot[data-type="陶器"] { background: var(--garbage-toki); border-left-color: #F44336; }
-.event-dot[data-type="プラ"] { background: var(--garbage-pura); border-left-color: #E91E63; }
-.event-dot[data-type="ペット"] { background: var(--garbage-petto); border-left-color: #4CAF50; }
-.event-dot[data-type="缶"] { background: var(--garbage-kan); border-left-color: #9E9E9E; }
-.event-dot[data-type="ビン"] { background: var(--garbage-bin); border-left-color: #03A9F4; }
-.event-dot[data-type="破砕"] { background: var(--garbage-hasai); border-left-color: #9C27B0; }
+/* ★修正：ゴミの日の .event-dot スタイルは不要になったため削除 */
 
 
 /* ========================================
@@ -892,7 +960,7 @@ body {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* ★新機能：グループ管理リスト */
+/* グループ管理リスト */
 .group-list {
     list-style: none;
     padding: 0;
@@ -1027,7 +1095,6 @@ body {
 }
 
 .time-inputs select {
-    /* 変更：inputからselectに変更されたため */
     padding: var(--spacing-sm);
     background: var(--bg-tertiary);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1223,5 +1290,30 @@ body {
     
     .todo-item {
         min-width: 100%;
+    }
+
+    /* ★修正：スマホでクイックリンクが場所を取りすぎないように */
+    .quick-links a {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.75rem;
+    }
+    .quick-links a span {
+        display: none; /* アイコンのみ表示 */
+    }
+    .widget-header {
+        flex-wrap: wrap; /* ヘッダーも折り返す */
+    }
+    .quick-links {
+        width: 100%; /* クイックリンクは改行して全幅 */
+        justify-content: space-around;
+        order: 3; /* 3番目に表示 */
+        padding-top: var(--spacing-sm);
+    }
+    .widget-header h2 {
+        order: 1;
+    }
+    .todo-controls {
+        order: 2;
+        margin-left: auto; /* 右寄せ維持 */
     }
 }
