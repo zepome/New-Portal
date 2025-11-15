@@ -1,5 +1,5 @@
 /* ========================================
-   Zepome's Portal - V3 Script (New Features)
+   Zepome's Portal - V4 Script (Display Fixes)
    ======================================== */
 
 // グローバル変数
@@ -42,7 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderSpreadsheetTabs();
     setupEventListeners();
     
-    // Gmail未読数を定期的に更新（5分ごと）
     setInterval(updateGmailCount, 300000);
     
     
@@ -497,35 +496,47 @@ function createCalendarDay(day, isOtherMonth, year, month) {
         dayEl.classList.add('today');
     }
     
-    // YYYY-MM-DD形式の文字列と、日付オブジェクトを作成
     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     const dateObj = new Date(year, month, day);
 
-    // ★修正：日付ヘッダーをFlexコンテナに変更
     const dayHeaderFlex = document.createElement('div');
     dayHeaderFlex.className = 'day-header-flex';
     
     const dayNumber = document.createElement('div');
     dayNumber.className = 'day-number';
     dayNumber.textContent = day;
-    dayHeaderFlex.appendChild(dayNumber); // Flexコンテナに追加
+    dayHeaderFlex.appendChild(dayNumber); 
 
-    // ★新機能：ゴミの日アイコンコンテナ
     const garbageIconsContainer = document.createElement('div');
     garbageIconsContainer.className = 'garbage-icons';
     
-    // ゴミの日イベントを取得
     const dayGarbageEvents = getGarbageEventsForDate(dateStr, dateObj);
-    dayGarbageEvents.forEach(event => {
-        const icon = document.createElement('i');
-        icon.className = 'fas fa-trash garbage-icon'; // Font Awesomeのゴミ箱アイコン
-        icon.dataset.type = event.title;
-        icon.title = event.title; // ホバーで名前を表示
-        garbageIconsContainer.appendChild(icon);
-    });
-    dayHeaderFlex.appendChild(garbageIconsContainer); // Flexコンテナに追加
     
-    dayEl.appendChild(dayHeaderFlex); // 日付ヘッダーをセルに追加
+    // ★修正：アイコンとテキストを両方表示
+    dayGarbageEvents.forEach(event => {
+        // コンテナ（ <div class="garbage-item"> ）を作成
+        const garbageItem = document.createElement('div');
+        garbageItem.className = 'garbage-item';
+        garbageItem.title = event.title; // ホバーで名前を表示
+
+        // アイコン（ <i ...> ）を作成
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-trash garbage-icon';
+        icon.dataset.type = event.title;
+        garbageItem.appendChild(icon);
+
+        // テキスト（ <span ...> ）を作成
+        const text = document.createElement('span');
+        text.className = 'garbage-text';
+        text.textContent = event.title; // ゴミの種類をテキストで表示
+        garbageItem.appendChild(text);
+
+        // コンテナを日付ヘッダーに追加
+        garbageIconsContainer.appendChild(garbageItem);
+    });
+    dayHeaderFlex.appendChild(garbageIconsContainer); 
+    
+    dayEl.appendChild(dayHeaderFlex); 
 
     
     // イベント追加ボタン
@@ -540,7 +551,6 @@ function createCalendarDay(day, isOtherMonth, year, month) {
         dayEl.appendChild(addBtn);
     }
     
-    // ★修正：Todoイベントのみを取得
     const dayTodos = getTodosForDate(dateStr);
     
     if (dayTodos.length > 0) {
@@ -559,7 +569,6 @@ function createCalendarDay(day, isOtherMonth, year, month) {
     return dayEl;
 }
 
-// Todoイベントのみを取得する
 function getTodosForDate(dateStr) {
     return todos.filter(todo => {
         if (!todo.dueDate) return false;
@@ -568,7 +577,7 @@ function getTodosForDate(dateStr) {
         title: todo.title,
         time: todo.time || null,
         isGarbage: false
-    })).sort((a, b) => { // 時間順にソート
+    })).sort((a, b) => { 
         if (!a.time) return 1;
         if (!b.time) return -1;
         return a.time.localeCompare(b.time);
