@@ -49,7 +49,6 @@
     --radius-xl: 24px;
 
     /* Garbage Colors */
-    /* ★修正：色を濃いめにしてアイコンが見やすいように */
     --garbage-koshi: #FFEB3B; /* 黄色 */
     --garbage-shokyaku: #FF9800; /* オレンジ */
     --garbage-toki: #F44336; /* 赤 */
@@ -357,7 +356,6 @@ body {
     margin-bottom: var(--spacing-md);
     padding-bottom: var(--spacing-sm);
     border-bottom: 2px solid var(--bg-tertiary);
-    /* ★修正：ヘッダー内の要素間に隙間をあける */
     gap: var(--spacing-sm);
 }
 
@@ -368,7 +366,6 @@ body {
     align-items: center;
     gap: var(--spacing-xs);
     color: var(--text-primary);
-    /* ★追加：タイトルが縮まないように */
     flex-shrink: 0;
 }
 
@@ -378,16 +375,15 @@ body {
 }
 
 /* ========================================
-   ★新機能：Quick Links
+   Quick Links
    ======================================== */
 .quick-links {
     display: flex;
     gap: var(--spacing-xs);
     align-items: center;
-    /* ★追加：空欄を埋める */
     flex-grow: 1;
     justify-content: center;
-    overflow-x: auto; /* スマホで溢れたらスクロール */
+    overflow-x: auto; 
 }
 
 .quick-links a {
@@ -412,7 +408,6 @@ body {
     border-color: var(--neon-blue);
 }
 
-/* アイコンの色分け */
 .quick-links a[data-icon="udemy"] i { color: #A435F0; }
 .quick-links a[data-icon="jdla"] i { color: #00AEEF; }
 .quick-links a[data-icon="ai-pass"] i { color: #f0c30e; }
@@ -530,7 +525,6 @@ body {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
-    /* ★追加：縮まないように */
     flex-shrink: 0;
 }
 
@@ -737,7 +731,7 @@ body {
 .day-header-flex {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start; /* 左寄せに変更 */
     gap: var(--spacing-xs);
     width: 100%;
     margin-bottom: 0.5rem;
@@ -746,20 +740,31 @@ body {
 .day-number {
     font-weight: 700;
     font-size: 1.3rem;
+    flex-shrink: 0; /* 数字が縮まないように */
 }
 
-/* ★新機能：ゴミの日アイコンコンテナ */
+/* ★修正：ゴミの日アイコンコンテナ */
 .garbage-icons {
     display: flex;
-    gap: 4px;
-    flex-wrap: wrap; /* アイコンが多い日は折り返す */
-    flex: 1; /* 残りのスペースを埋める */
+    flex-direction: column; /* 縦に並べる */
+    gap: 2px;
+    flex-wrap: wrap; 
+    flex: 1; 
+    margin-left: 1em; /* ★全角1文字分のマージンを追加 */
 }
 
-/* ★新機能：ゴミの日アイコン */
+/* ★修正：ゴミの日アイテム（アイコン＋テキスト） */
+.garbage-item {
+    display: flex;
+    align-items: center;
+    gap: 4px; /* アイコンとテキストの間隔 */
+}
+
+/* ★修正：ゴミの日アイコン */
 .garbage-icon {
-    font-size: 1rem; /* 日付より少し小さく */
+    font-size: 0.9rem; /* 少し小さく */
     text-shadow: 0 0 5px rgba(0,0,0,0.5);
+    flex-shrink: 0;
 }
 .garbage-icon[data-type="古紙"] { color: var(--garbage-koshi); }
 .garbage-icon[data-type="焼却"] { color: var(--garbage-shokyaku); }
@@ -770,6 +775,16 @@ body {
 .garbage-icon[data-type="ビン"] { color: var(--garbage-bin); }
 .garbage-icon[data-type="破砕"] { color: var(--garbage-hasai); }
 
+/* ★新機能：ゴミの日テキスト */
+.garbage-text {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    /* 文字が見切れないように */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
 .day-events {
     display: flex;
@@ -793,8 +808,6 @@ body {
     border-left: 3px solid var(--neon-blue);
     color: var(--text-primary);
 }
-
-/* ★修正：ゴミの日の .event-dot スタイルは不要になったため削除 */
 
 
 /* ========================================
@@ -1007,6 +1020,13 @@ body {
     display: flex;
     align-items: center;
     gap: var(--spacing-xs);
+}
+
+/* ★新機能：ゴミの日モーダルの日付ピッカーアイコンを白く・大きくする */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(1.2); /* 色を反転（白）にし、少し明るく */
+    font-size: 1.2rem; /* アイコンを少し大きく */
+    cursor: pointer;
 }
 
 .calendar-icon {
@@ -1292,21 +1312,21 @@ body {
         min-width: 100%;
     }
 
-    /* ★修正：スマホでクイックリンクが場所を取りすぎないように */
     .quick-links a {
         padding: 0.4rem 0.6rem;
         font-size: 0.75rem;
     }
-    .quick-links a span {
-        display: none; /* アイコンのみ表示 */
-    }
+    /* ★修正：スマホではアイコン横のテキストも表示（スペースがあるため） */
+    /* .quick-links a span {
+        display: none; 
+    } */
     .widget-header {
-        flex-wrap: wrap; /* ヘッダーも折り返す */
+        flex-wrap: wrap; 
     }
     .quick-links {
-        width: 100%; /* クイックリンクは改行して全幅 */
+        width: 100%; 
         justify-content: space-around;
-        order: 3; /* 3番目に表示 */
+        order: 3; 
         padding-top: var(--spacing-sm);
     }
     .widget-header h2 {
@@ -1314,6 +1334,21 @@ body {
     }
     .todo-controls {
         order: 2;
-        margin-left: auto; /* 右寄せ維持 */
+        margin-left: auto; 
+    }
+
+    /* ★修正：スマホでのゴミの日表示 */
+    .day-header-flex {
+        flex-direction: column; /* 日付とアイコンを縦積みに */
+        align-items: flex-start;
+        gap: 2px;
+    }
+    .garbage-icons {
+        margin-left: 0; /* 縦積みなのでマージン不要 */
+        flex-direction: row; /* アイコン自体は横に並べる */
+        gap: 6px;
+    }
+    .garbage-text {
+        display: none; /* スマホではスペースがないのでテキストは非表示 */
     }
 }
