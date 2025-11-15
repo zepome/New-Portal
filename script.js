@@ -1,5 +1,5 @@
 /* ========================================
-   Zepome's Portal - V7 Script (Garbage Deletion)
+   Zepome's Portal - V7.1 Script (Error Fix)
    ======================================== */
 
 // グローバル変数
@@ -48,14 +48,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isGoogleAPIConfigured()) {
         const gmailCountEl = document.getElementById('gmailCount');
         if (gmailCountEl) {
-            // ★修正：Gmailアイコンのクリック動作
+            // Gmailアイコンのクリック動作
             gmailCountEl.addEventListener('click', (e) => {
-                if (!accessToken) { // ★もし認証トークンがまだ無いなら
+                if (!accessToken) { // もし認証トークンがまだ無いなら
                     e.preventDefault(); // リンクを無効化
                     console.log('Starting authentication...');
                     handleAuthClick(); // 認証を開始
                 }
-                // ★認証トークンが既にある場合は、preventDefault() を呼ばないので、
+                // 認証トークンが既にある場合は、preventDefault() を呼ばないので、
                 // HTMLの <a href="..." target="_blank"> のデフォルト動作（Gmailを開く）が実行される
             });
         }
@@ -86,7 +86,7 @@ function updateCurrentTime() {
         second: '2-digit'
     });
     
-    // ★修正：曜日の（）の前に半角スペースを追加
+    // 曜日の（）の前に半角スペースを追加
     const dateStringWithWeekday = now.toLocaleDateString('ja-JP', {
         year: 'numeric',
         month: '2-digit',
@@ -225,6 +225,7 @@ async function loadWeatherMini(location) {
         const todayForecast = data[0].timeSeries[0];
         const area = todayForecast.areas[0];
         
+        // ★エラー修正： '{TRUNCATED}' ではなく、全角スペースで区切る
         const weatherText = area.weathers[0].split('　')[0];
         const weatherIcon = getWeatherIcon(weatherText);
         
@@ -983,7 +984,10 @@ function saveGarbageEvent() {
     garbageDays.push(newGarbageEvent);
     saveGarbageDays();
     renderCalendar();
-    closeGarbageModal(); // ★保存したらモーダルを閉じる
+    // ★修正：保存後、モーダルを閉じるのではなく、リストを更新
+    renderGarbageRuleList();
+    // フォームをリセット（任意）
+    // document.getElementById('garbageDate').value = new Date().toISOString().split('T')[0];
 }
 
 function getGarbageEventsForDate(dateStr, dateObj) {
