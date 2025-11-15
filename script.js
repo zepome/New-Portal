@@ -1,5 +1,5 @@
 /* ========================================
-   Zepome's Portal - V7.1 Script (Error Fix)
+   Zepome's Portal - V8 Script (New Repeats & Fixes)
    ======================================== */
 
 // グローバル変数
@@ -55,8 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.log('Starting authentication...');
                     handleAuthClick(); // 認証を開始
                 }
-                // 認証トークンが既にある場合は、preventDefault() を呼ばないので、
-                // HTMLの <a href="..." target="_blank"> のデフォルト動作（Gmailを開く）が実行される
             });
         }
     }
@@ -86,7 +84,6 @@ function updateCurrentTime() {
         second: '2-digit'
     });
     
-    // 曜日の（）の前に半角スペースを追加
     const dateStringWithWeekday = now.toLocaleDateString('ja-JP', {
         year: 'numeric',
         month: '2-digit',
@@ -225,7 +222,6 @@ async function loadWeatherMini(location) {
         const todayForecast = data[0].timeSeries[0];
         const area = todayForecast.areas[0];
         
-        // ★エラー修正： '{TRUNCATED}' ではなく、全角スペースで区切る
         const weatherText = area.weathers[0].split('　')[0];
         const weatherIcon = getWeatherIcon(weatherText);
         
@@ -953,10 +949,10 @@ function deleteGroup(groupName) {
    ゴミの日カレンダー
    ======================================== */
 
-// ★修正：モーダルを開くときに、ルール一覧も描画
+// モーダルを開くときに、ルール一覧も描画
 function openGarbageModal() {
     document.getElementById('garbageDate').value = new Date().toISOString().split('T')[0];
-    renderGarbageRuleList(); // ★ルール一覧を描画
+    renderGarbageRuleList(); // ルール一覧を描画
     document.getElementById('garbageModal').classList.add('active');
 }
 
@@ -964,6 +960,61 @@ function closeGarbageModal() {
     document.getElementById('garbageModal').classList.remove('active');
 }
 
+// ★新機能：ルールを分かりやすい日本語にフォーマットする
+function formatGarbageRule(rule) {
+    const dateObj = new Date(rule.startDate + 'T00:00:00');
+    const dayName = dateObj.toLocaleDateString('ja-JP', { weekday: 'short' });
+    const day = dateObj.getDate();
+    const week = Math.floor((day - 1) / 7) + 1;
+
+    let repeatText = '';
+    
+    switch (rule.repeat) {
+        case 'none':
+            repeatText = `[${rule.startDate}]`;
+            break;
+        case 'weekly':
+            repeatText = `[毎週 ${dayName}曜日]`;
+            break;
+        case 'monthly-date':
+            repeatText = `[毎月 ${day}日]`;
+            break;
+        case 'monthly-day':
+            repeatText = `[毎月 第${week} ${dayName}曜日]`;
+            break;
+        // ★新機能：追加ルール
+        case 'weekly-tue-fri':
+            repeatText = '[毎週 火・金曜日]';
+            break;
+        case 'monthly-1-wed':
+            repeatText = '[毎月 第1 水曜日]';
+            break;
+        case 'monthly-1-3-mon':
+            repeatText = '[毎月 第1・第3 月曜日]';
+            break;
+        case 'monthly-2-thu':
+            repeatText = '[毎月 第2 木曜日]';
+            break;
+        case 'monthly-2-4-5-mon':
+            repeatText = '[毎月 第2・第4・第5 月曜日]';
+            break;
+        case 'monthly-3-wed':
+            repeatText = '[毎月 第3 水曜日]';
+            break;
+        case 'monthly-3-thu':
+            repeatText = '[毎月 第3 木曜日]';
+            break;
+        case 'monthly-4-thu':
+            repeatText = '[毎月 第4 木曜日]';
+            break;
+        default:
+            repeatText = '[不明なルール]';
+    }
+    return `${repeatText} ${rule.type}`;
+}
+
+
+// ★バグ修正：保存ロジック（重複チェック＆閉じる）
 function saveGarbageEvent() {
     const type = document.getElementById('garbageType').value;
     const repeatType = document.getElementById('garbageRepeatType').value;
@@ -975,28 +1026,36 @@ function saveGarbageEvent() {
     }
 
     const newGarbageEvent = {
-        id: Date.now(), // ★削除用にIDを付与
+        id: Date.now(),
         type: type,
         repeat: repeatType,
         startDate: dateStr
     };
 
+    // ★重複チェック
+    const ruleString = formatGarbageRule(newGarbageEvent);
+    const isDuplicate = garbageDays.some(rule => formatGarbageRule(rule) === ruleString);
+
+    if (isDuplicate) {
+        alert('同じ設定のルールが既に存在します：\n' + ruleString);
+        return; // 追加しない
+    }
+
     garbageDays.push(newGarbageEvent);
     saveGarbageDays();
     renderCalendar();
-    // ★修正：保存後、モーダルを閉じるのではなく、リストを更新
-    renderGarbageRuleList();
-    // フォームをリセット（任意）
-    // document.getElementById('garbageDate').value = new Date().toISOString().split('T')[0];
+    closeGarbageModal(); // ★バグ修正：保存したら閉じる
 }
 
+// ★機能追加：新しい繰り返しルールを判定
 function getGarbageEventsForDate(dateStr, dateObj) {
     const events = [];
     
     const year = dateObj.getFullYear();
     const month = dateObj.getMonth(); // 0-11
     const date = dateObj.getDate(); // 1-31
-    const dayOfWeek = dateObj.getDay(); // 0=日, 1=月, ...
+    const dayOfWeek = dateObj.getDay(); // 0=日, 1=月, 2=火, 3=水, 4=木, 5=金, 6=土
+    const weekOfMonth = Math.floor((date - 1) / 7) + 1; // 1-5
 
     garbageDays.forEach(event => {
         const startDate = new Date(event.startDate + 'T00:00:00'); 
@@ -1006,35 +1065,48 @@ function getGarbageEventsForDate(dateStr, dateObj) {
 
         const startDay = startDate.getDate();
         const startDayOfWeek = startDate.getDay();
+        const startWeekOfMonth = Math.floor((startDay - 1) / 7) + 1;
 
         let match = false;
 
         switch (event.repeat) {
             case 'none':
-                if (event.startDate === dateStr) {
-                    match = true;
-                }
+                if (event.startDate === dateStr) match = true;
                 break;
-            
             case 'weekly':
-                if (dayOfWeek === startDayOfWeek) {
-                    match = true;
-                }
+                if (dayOfWeek === startDayOfWeek) match = true;
                 break;
-            
             case 'monthly-date':
-                if (date === startDay) {
-                    match = true;
-                }
+                if (date === startDay) match = true;
+                break;
+            case 'monthly-day':
+                if (dayOfWeek === startDayOfWeek && weekOfMonth === startWeekOfMonth) match = true;
                 break;
             
-            case 'monthly-day':
-                const weekOfMonth = Math.floor((date - 1) / 7) + 1;
-                const startWeekOfMonth = Math.floor((startDay - 1) / 7) + 1;
-                
-                if (dayOfWeek === startDayOfWeek && weekOfMonth === startWeekOfMonth) {
-                    match = true;
-                }
+            // ★新機能：追加ルール
+            case 'weekly-tue-fri': // 毎週 火・金曜日
+                if (dayOfWeek === 2 || dayOfWeek === 5) match = true;
+                break;
+            case 'monthly-1-wed': // 毎月 第1 水曜日
+                if (dayOfWeek === 3 && weekOfMonth === 1) match = true;
+                break;
+            case 'monthly-1-3-mon': // 毎月 第1・第3 月曜日
+                if (dayOfWeek === 1 && (weekOfMonth === 1 || weekOfMonth === 3)) match = true;
+                break;
+            case 'monthly-2-thu': // 毎月 第2 木曜日
+                if (dayOfWeek === 4 && weekOfMonth === 2) match = true;
+                break;
+            case 'monthly-2-4-5-mon': // 毎月 第2・第4・第5 月曜日
+                if (dayOfWeek === 1 && (weekOfMonth === 2 || weekOfMonth === 4 || weekOfMonth === 5)) match = true;
+                break;
+            case 'monthly-3-wed': // 毎月 第3 水曜日
+                if (dayOfWeek === 3 && weekOfMonth === 3) match = true;
+                break;
+            case 'monthly-3-thu': // 毎月 第3 木曜日
+                if (dayOfWeek === 4 && weekOfMonth === 3) match = true;
+                break;
+            case 'monthly-4-thu': // 毎月 第4 木曜日
+                if (dayOfWeek === 4 && weekOfMonth === 4) match = true;
                 break;
         }
 
@@ -1050,7 +1122,7 @@ function getGarbageEventsForDate(dateStr, dateObj) {
     return events;
 }
 
-// ★新機能：ゴミの日ルール一覧をモーダル内に描画する
+// ゴミの日ルール一覧をモーダル内に描画する
 function renderGarbageRuleList() {
     const container = document.getElementById('garbageRuleListContainer');
     container.innerHTML = ''; // 初期化
@@ -1075,28 +1147,7 @@ function renderGarbageRuleList() {
     container.innerHTML = html;
 }
 
-// ★新機能：ルールを分かりやすい日本語にフォーマットする
-function formatGarbageRule(rule) {
-    const dateObj = new Date(rule.startDate + 'T00:00:00');
-    const dayName = dateObj.toLocaleDateString('ja-JP', { weekday: 'short' });
-    const day = dateObj.getDate();
-    
-    switch (rule.repeat) {
-        case 'none':
-            return `[${rule.startDate}] ${rule.type}`;
-        case 'weekly':
-            return `[毎週 ${dayName}曜日] ${rule.type}`;
-        case 'monthly-date':
-            return `[毎月 ${day}日] ${rule.type}`;
-        case 'monthly-day':
-            const week = Math.floor((day - 1) / 7) + 1;
-            return `[毎月 第${week} ${dayName}曜日] ${rule.type}`;
-        default:
-            return rule.type;
-    }
-}
-
-// ★新機能：ゴミの日ルールを削除する
+// ゴミの日ルールを削除する
 function deleteGarbageRule(ruleId) {
     const rule = garbageDays.find(r => r.id === ruleId);
     if (!rule) return;
