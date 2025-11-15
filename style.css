@@ -28,7 +28,6 @@
     --danger: #ff006e;
     --info: #00d4ff;
 
-    /* ★新機能：淡いオレンジ */
     --light-orange: #FFDAB9; /* ピーチパフ */
     
     /* Shadows */
@@ -630,6 +629,17 @@ body {
     margin-left: auto;
 }
 
+/* ★修正：ゴミの日ボタンの色をTodo追加ボタンと同じに */
+#openGarbageModalBtn {
+    background: linear-gradient(135deg, var(--neon-purple) 0%, var(--neon-pink) 100%);
+    color: white;
+}
+#openGarbageModalBtn:hover {
+    box-shadow: 0 0 20px rgba(184, 79, 255, 0.6);
+    transform: scale(1.05);
+}
+
+
 .nav-btn {
     background: var(--bg-tertiary);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -668,13 +678,14 @@ body {
     padding: var(--spacing-sm);
     font-weight: 700;
     color: white;
-    font-size: 1.1rem;
+    /* ★修正：曜日を大きく */
+    font-size: 1.25rem;
 }
 
 .calendar-day {
-    /* ★修正：アスペクト比を1:1（正方形）に */
-    aspect-ratio: 1 / 1;
-    height: auto; /* min-heightから変更 */
+    /* ★修正：アスペクト比を 1 / 0.9 (横幅1に対し縦幅0.9) */
+    aspect-ratio: 1 / 0.9;
+    height: auto; 
 
     display: flex;
     flex-direction: column;
@@ -694,7 +705,6 @@ body {
     display: none;
     position: absolute;
     top: 5px;
-    /* ★修正：ゴミ箱と被らないように左上に変更 */
     left: 5px;
     background: var(--neon-purple);
     border: none;
@@ -705,7 +715,7 @@ body {
     cursor: pointer;
     font-size: 0.8rem;
     transition: all 0.3s ease;
-    z-index: 5; /* ゴミ箱より手前に */
+    z-index: 5; 
 }
 
 .calendar-day:hover .add-event-btn {
@@ -735,57 +745,71 @@ body {
     opacity: 0.3;
 }
 
-/* ★修正：日付とゴミの日アイコンを横並びにするコンテナ */
 .day-header-flex {
     display: flex;
-    align-items: flex-start; /* 上揃え */
-    justify-content: flex-start; /* 左寄せ */
+    align-items: flex-start; 
+    justify-content: flex-start; 
     width: 100%;
     margin-bottom: 0.5rem;
-    position: relative; /* 子要素のabsoluteの基準点 */
-    height: 36px; /* ヘッダーの高さをある程度確保 */
+    position: relative; 
+    height: 36px; 
 }
 
 .day-number {
     font-weight: 700;
-    font-size: 1.3rem;
-    /* ★修正：中央寄せ */
+    /* ★修正：日付を大きく */
+    font-size: 1.5rem;
     width: 100%;
     text-align: center;
-    position: absolute; /* 中央に配置 */
+    position: absolute; 
     left: 50%;
     transform: translateX(-50%);
+    /* ★追加：ゴミ箱の背面に回す */
+    z-index: 1;
 }
 
-/* ★修正：ゴミの日アイコンコンテナ */
 .garbage-icons {
     display: flex;
-    flex-direction: column; /* 縦に並べる */
+    flex-direction: column; 
     gap: 2px;
     flex-wrap: wrap; 
-    /* ★修正：右端に配置 */
     position: absolute;
     top: 0;
     right: 0;
-    align-items: flex-end; /* アイテムを右揃えに */
+    align-items: flex-end; 
+    /* ★追加：日付より手前に表示 */
+    z-index: 2;
 }
 
-/* ★修正：ゴミの日アイテム（アイコン＋テキスト） */
+/* ★修正：ゴミの日アイテム（枠線とサイズ） */
 .garbage-item {
     display: flex;
     align-items: center;
-    gap: 4px; /* アイコンとテキストの間隔 */
-    /* ★修正：サイズアップ */
-    font-size: 0.95rem; 
+    gap: 4px; 
+    font-size: 1rem; /* ★サイズアップ */
+    border: 2px solid; /* ★枠線追加 */
+    padding: 2px 6px; /* ★パディング追加 */
+    border-radius: var(--radius-sm); /* ★角丸 */
+    background: rgba(0,0,0,0.3); /* 背景を少し暗くして文字を読みやすく */
 }
 
-/* ★修正：ゴミの日アイコン */
+/* ★修正：枠線の色をゴミの種類ごとに設定 */
+.garbage-item[data-type="古紙"] { border-color: var(--garbage-koshi); }
+.garbage-item[data-type="焼却"] { border-color: var(--garbage-shokyaku); }
+.garbage-item[data-type="陶器"] { border-color: var(--garbage-toki); }
+.garbage-item[data-type="プラ"] { border-color: var(--garbage-pura); }
+.garbage-item[data-type="ペット"] { border-color: var(--garbage-petto); }
+.garbage-item[data-type="缶"] { border-color: var(--garbage-kan); }
+.garbage-item[data-type="ビン"] { border-color: var(--garbage-bin); }
+.garbage-item[data-type="破砕"] { border-color: var(--garbage-hasai); }
+
+
 .garbage-icon {
-    /* ★修正：サイズアップ */
     font-size: 1rem;
     text-shadow: 0 0 5px rgba(0,0,0,0.5);
     flex-shrink: 0;
 }
+/* ★修正：アイコンの色も枠線と同じ色に（統一感） */
 .garbage-icon[data-type="古紙"] { color: var(--garbage-koshi); }
 .garbage-icon[data-type="焼却"] { color: var(--garbage-shokyaku); }
 .garbage-icon[data-type="陶器"] { color: var(--garbage-toki); }
@@ -795,10 +819,8 @@ body {
 .garbage-icon[data-type="ビン"] { color: var(--garbage-bin); }
 .garbage-icon[data-type="破砕"] { color: var(--garbage-hasai); }
 
-/* ★修正：ゴミの日テキスト */
 .garbage-text {
-    /* ★修正：サイズアップ */
-    font-size: 0.9rem;
+    font-size: 0.95rem; /* ★サイズアップ */
     font-weight: 600;
     color: var(--text-primary);
     white-space: nowrap;
@@ -1044,8 +1066,8 @@ body {
 
 /* ★修正：ゴミの日モーダルの日付ピッカーアイコンを白く・大きくする */
 input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1) brightness(1.2); /* 色を反転（白）にし、少し明るく */
-    font-size: 1.2rem; /* アイコンを少し大きく */
+    filter: invert(1) brightness(1.2); 
+    font-size: 1.2rem; 
     cursor: pointer;
     opacity: 0.8;
 }
@@ -1316,9 +1338,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     }
     
     .calendar-day {
-        /* 縦横比は維持 */
-        aspect-ratio: 1 / 1;
-        min-height: auto; /* min-heightをリセット */
+        aspect-ratio: 1 / 0.9;
+        min-height: auto; 
     }
 }
 
@@ -1361,25 +1382,34 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
         margin-left: auto; 
     }
 
-    /* ★修正：スマホでのゴミの日表示（アイコンのみ） */
+    /* ★修正：スマホでのカレンダー日付・ゴミ表示 */
     .day-header-flex {
         flex-direction: column; 
-        align-items: center; /* 数字を中央に */
+        align-items: center; 
         gap: 2px;
-        height: auto; /* 高さを自動に */
+        height: auto; 
     }
     .day-number {
-        position: static; /* staticに戻す */
+        position: static; 
         transform: none;
         width: auto;
+        font-size: 1.3rem; /* スマホではサイズを少し戻す */
     }
     .garbage-icons {
-        position: static; /* staticに戻す */
-        flex-direction: row; /* アイコン自体は横に並べる */
+        position: static; 
+        flex-direction: row; 
         gap: 6px;
-        justify-content: center; /* アイコンを中央寄せ */
+        justify-content: center; 
     }
     .garbage-text {
-        display: none; /* スマホではスペースがないのでテキストは非表示 */
+        display: none; /* スマホではテキスト非表示 */
+    }
+    .garbage-item {
+        border: none; /* スマホでは枠線なし */
+        padding: 0;
+        background: none;
+    }
+    .garbage-icon {
+        font-size: 0.9rem; /* スマホではアイコンのみ */
     }
 }
