@@ -28,7 +28,7 @@
     --danger: #ff006e;
     --info: #00d4ff;
 
-    --light-orange: #FFDAB9; /* ピーチパフ */
+    --light-orange: #FFDAB9; 
     
     /* Shadows */
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -764,7 +764,6 @@ body {
     position: absolute; 
     left: 50%;
     transform: translateX(-50%);
-    /* ★追加：ゴミ箱の背面に回す */
     z-index: 1;
 }
 
@@ -777,7 +776,6 @@ body {
     top: 0;
     right: 0;
     align-items: flex-end; 
-    /* ★追加：日付より手前に表示 */
     z-index: 2;
 }
 
@@ -790,7 +788,7 @@ body {
     border: 2px solid; /* ★枠線追加 */
     padding: 2px 6px; /* ★パディング追加 */
     border-radius: var(--radius-sm); /* ★角丸 */
-    background: rgba(0,0,0,0.3); /* 背景を少し暗くして文字を読みやすく */
+    background: rgba(0,0,0,0.3); 
 }
 
 /* ★修正：枠線の色をゴミの種類ごとに設定 */
@@ -935,6 +933,20 @@ body {
     font-size: 4rem;
     margin-bottom: var(--spacing-md);
     opacity: 0.3;
+}
+
+/* ========================================
+   ★新機能：X Timeline Widget
+   ======================================== */
+.twitter-widget-full .widget-header i {
+    color: #00d4ff; /* X (Twitter) Blue / Neon Blue */
+}
+
+.twitter-container {
+    display: grid;
+    /* 横に3列、最小300pxで自動調整 */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-md);
 }
 
 /* ========================================
@@ -1382,7 +1394,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
         margin-left: auto; 
     }
 
-    /* ★修正：スマホでのカレンダー日付・ゴミ表示 */
     .day-header-flex {
         flex-direction: column; 
         align-items: center; 
@@ -1393,7 +1404,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
         position: static; 
         transform: none;
         width: auto;
-        font-size: 1.3rem; /* スマホではサイズを少し戻す */
+        font-size: 1.3rem; 
     }
     .garbage-icons {
         position: static; 
@@ -1402,14 +1413,19 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
         justify-content: center; 
     }
     .garbage-text {
-        display: none; /* スマホではテキスト非表示 */
+        display: none; 
     }
     .garbage-item {
-        border: none; /* スマホでは枠線なし */
+        border: none; 
         padding: 0;
         background: none;
     }
     .garbage-icon {
-        font-size: 0.9rem; /* スマホではアイコンのみ */
+        font-size: 0.9rem; 
+    }
+
+    /* ★新機能：X(Twitter)コンテナのスマホ対応 */
+    .twitter-container {
+        grid-template-columns: 1fr;
     }
 }
