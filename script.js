@@ -1,5 +1,5 @@
 /* ========================================
-   Zepome's Portal - V8 Script (New Repeats & Fixes)
+   Zepome's Portal - V9 Script (New Garbage Rules)
    ======================================== */
 
 // グローバル変数
@@ -963,7 +963,8 @@ function closeGarbageModal() {
 // ★新機能：ルールを分かりやすい日本語にフォーマットする
 function formatGarbageRule(rule) {
     const dateObj = new Date(rule.startDate + 'T00:00:00');
-    const dayName = dateObj.toLocaleDateString('ja-JP', { weekday: 'short' });
+    // 'short'だと (日) などになるため 'narrow' (日) に変更
+    const dayName = dateObj.toLocaleDateString('ja-JP', { weekday: 'narrow' }); 
     const day = dateObj.getDate();
     const week = Math.floor((day - 1) / 7) + 1;
 
@@ -974,38 +975,38 @@ function formatGarbageRule(rule) {
             repeatText = `[${rule.startDate}]`;
             break;
         case 'weekly':
-            repeatText = `[毎週 ${dayName}曜日]`;
+            repeatText = `[毎週 ${dayName}曜]`;
             break;
         case 'monthly-date':
             repeatText = `[毎月 ${day}日]`;
             break;
         case 'monthly-day':
-            repeatText = `[毎月 第${week} ${dayName}曜日]`;
+            repeatText = `[毎月 第${week} ${dayName}曜]`;
             break;
         // ★新機能：追加ルール
         case 'weekly-tue-fri':
-            repeatText = '[毎週 火・金曜日]';
+            repeatText = '[毎週 火・金曜]';
             break;
         case 'monthly-1-wed':
-            repeatText = '[毎月 第1 水曜日]';
+            repeatText = '[毎月 第1 水曜]';
             break;
         case 'monthly-1-3-mon':
-            repeatText = '[毎月 第1・第3 月曜日]';
+            repeatText = '[毎月 第1・3 月曜]';
             break;
         case 'monthly-2-thu':
-            repeatText = '[毎月 第2 木曜日]';
+            repeatText = '[毎月 第2 木曜]';
             break;
         case 'monthly-2-4-5-mon':
-            repeatText = '[毎月 第2・第4・第5 月曜日]';
+            repeatText = '[毎月 第2・4・5 月曜]';
             break;
         case 'monthly-3-wed':
-            repeatText = '[毎月 第3 水曜日]';
+            repeatText = '[毎月 第3 水曜]';
             break;
         case 'monthly-3-thu':
-            repeatText = '[毎月 第3 木曜日]';
+            repeatText = '[毎月 第3 木曜]';
             break;
         case 'monthly-4-thu':
-            repeatText = '[毎月 第4 木曜日]';
+            repeatText = '[毎月 第4 木曜]';
             break;
         default:
             repeatText = '[不明なルール]';
