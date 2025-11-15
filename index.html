@@ -1,1443 +1,400 @@
-/* ========================================
-   Zepome's Portal - Final Layout
-   ======================================== */
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zepome's Portal</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">
+                <i class="fas fa-rocket"></i>
+                Zepome's New Portal
+            </h1>
+            
+            <div class="header-right">
+                <div class="header-weather">
+                    <div class="weather-tabs-mini">
+                        <button class="tab-btn-mini active" data-location="shiga">滋賀</button>
+                        <button class="tab-btn-mini" data-location="osaka">大阪</button>
+                        <button class="tab-btn-mini" data-location="tokyo">東京</button>
+                    </div>
+                    <div id="weatherContentMini" class="weather-content-mini">
+                        <i class="fas fa-cloud weather-icon"></i>
+                        <span class="weather-mini-text">Loading...</span>
+                    </div>
+                </div>
+                
+                <div class="header-timer">
+                    <div class="timer-switch-mini">
+                        <button id="timerBtnMini" class="switch-btn-mini active">タイマー</button>
+                        <button id="stopwatchBtnMini" class="switch-btn-mini">SW</button>
+                    </div>
+                    <div class="timer-display-mini" id="timerDisplayMini">00:00:00.0</div>
+                    <div class="timer-controls-mini">
+                        <button id="timerStartMini" class="control-btn-mini">▶</button>
+                        <button id="timerResetMini" class="control-btn-mini">↻</button>
+                    </div>
+                </div>
+                
+                <div class="header-info">
+                    <div class="datetime-container">
+                        <div id="currentDate" class="current-date"></div>
+                        <div id="currentTime" class="current-time">
+                            <i class="fas fa-clock"></i>
+                            <span id="timeDisplay"></span>
+                        </div>
+                    </div>
+                    <a href="https://mail.google.com/mail/u/0/#inbox" target="_blank" id="gmailCount" class="gmail-count">
+                        <i class="fas fa-envelope"></i>
+                        <span id="unreadCount">0</span>
+                    </a>
+                </div>
+            </div>
+        </header>
 
-:root {
-    /* Dark Mode Colors */
-    --bg-primary: #0a0e27;
-    --bg-secondary: #151932;
-    --bg-tertiary: #1e2139;
-    --bg-hover: #252945;
+        <div class="widget todo-widget-full">
+            <div class="widget-header">
+                <h2><i class="fas fa-tasks"></i> Todo リスト</h2>
+
+                <div class="quick-links">
+                    <a href="https://www.udemy.com/join/login-popup/" title="Udemy" target="_blank" data-icon="udemy">
+                        <i class="fas fa-graduation-cap"></i> Udemy
+                    </a>
+                    <a href="https://www.jdla.org/" title="G検定" target="_blank" data-icon="jdla">
+                        <i class="fas fa-brain"></i> G検定
+                    </a>
+                    <a href="https://guga.or.jp/outline/" title="生成AIパスポート" target="_blank" data-icon="ai-pass">
+                        <i class="fas fa-robot"></i> 生成AIパスポート
+                    </a>
+                    <a href="https://skillshop.docebosaas.com/pages/23/google-analytics" title="GAIQ" target="_blank" data-icon="ga">
+                        <i class="fas fa-chart-line"></i> GAIQ
+                    </a>
+                    <a href="https://skillshop.docebosaas.com/pages/16/skillshop-home-page" title="Google広告" target="_blank" data-icon="ads">
+                        <i class="fas fa-bullhorn"></i> Google広告
+                    </a>
+                </div>
+
+                <div class="todo-controls">
+                    <div class="sort-dropdown">
+                        <button id="sortBtn" class="sort-btn">
+                            <i class="fas fa-filter"></i> ソート
+                        </button>
+                        <div id="sortMenu" class="sort-menu" style="display: none;">
+                            <button class="sort-option active" data-sort="all"><i class="fas fa-list"></i> 全て</button>
+                            <button class="sort-option" data-sort="time"><i class="fas fa-clock"></i> 時間順</button>
+                            <button class="sort-option" data-sort="group"><i class="fas fa-folder"></i> グループ別</button>
+                            <button class="sort-option" data-sort="day"><i class="fas fa-calendar-day"></i> 日別</button>
+                            <button class="sort-option" data-sort="month"><i class="fas fa-calendar"></i> 月別</button>
+                            <button class="sort-option" data-sort="morning"><i class="fas fa-sun"></i> 朝 (6-11時)</button>
+                            <button class="sort-option" data-sort="afternoon"><i class="fas fa-cloud-sun"></i> 昼 (12-17時)</button>
+                            <button class="sort-option" data-sort="evening"><i class="fas fa-moon"></i> 夜 (18-23時)</button>
+                        </div>
+                    </div>
+                    <button id="addTodoBtn" class="add-btn">
+                        <i class="fas fa-plus"></i> 追加
+                    </button>
+                </div>
+            </div>
+            <div id="todoList" class="todo-list-horizontal">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+
+        <div class="widget calendar-widget-full">
+            <div class="widget-header">
+                <h2><i class="fas fa-calendar-alt"></i> カレンダー</h2>
+                <div class="calendar-nav">
+                    <button id="openGarbageModalBtn" class="add-btn">
+                        <i class="fas fa-trash-alt"></i> ゴミの日設定
+                    </button>
+                    <button id="prevMonth" class="nav-btn"><i class="fas fa-chevron-left"></i></button>
+                    <span id="currentMonth" class="current-month"></span>
+                    <button id="nextMonth" class="nav-btn"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+            <div id="calendarGrid" class="calendar-grid"></div>
+        </div>
+
+        <div class="widget spreadsheet-widget-full">
+            <div class="widget-header">
+                <h2><i class="fas fa-table"></i> スプレッドシート</h2>
+                <button id="addSheetBtn" class="add-btn">
+                    <i class="fas fa-plus"></i> 追加
+                </button>
+            </div>
+            <div class="sheet-tabs" id="sheetTabs"></div>
+            <div id="sheetContent" class="sheet-content">
+                <div class="empty-state">
+                    <i class="fas fa-table"></i>
+                    <p>スプレッドシートを追加してください</p>
+                </div>
+            </div>
+        </div>
+
+    </div> <div id="timerSettingsModal" class="modal">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h3><i class="fas fa-clock"></i> タイマー設定</h3>
+                <button class="close-btn" id="closeTimerSettings">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="time-inputs">
+                    <select id="timerHours">
+                        <option value="0">00</option>
+                        <option value="1">01</option>
+                        <option value="2">02</option>
+                        <option value="3">03</option>
+                        <option value="4">04</option>
+                        <option value="5">05</option>
+                        <option value="6">06</option>
+                        <option value="7">07</option>
+                        <option value="8">08</option>
+                        <option value="9">09</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="21">21</option>
+                        <option value="22">22</option>
+                        <option value="23">23</option>
+                    </select>
+                    <span>:</span>
+                    <select id="timerMinutes">
+                        <option value="0">00</option>
+                        <option value="1">01</option>
+                        <option value="2">02</option>
+                        <option value="3">03</option>
+                        <option value="4">04</option>
+                        <option value="5" selected>05</option>
+                        <option value="6">06</option>
+                        <option value="7">07</option>
+                        <option value="8">08</option>
+                        <option value="9">09</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="25">25</option>
+                        <option value="30">30</option>
+                        <option value="35">35</option>
+                        <option value="40">40</option>
+                        <option value="45">45</option>
+                        <option value="50">50</option>
+                        <option value="55">55</option>
+                    </select>
+                    <span>:</span>
+                    <select id="timerSeconds">
+                        <option value="0" selected>00</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="30">30</option>
+                        <option value="40">40</option>
+                        <option value="45">45</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="setTimer" class="btn-primary">設定</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="todoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-tasks"></i> Todoを追加</h3>
+                <button class="close-btn" id="closeTodoModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>タスク名</label>
+                    <input type="text" id="todoTitle" placeholder="タスク名を入力">
+                </div>
+                <div class="form-group">
+                    <label>グループ</label>
+                    <div style="display: flex; gap: 10px;">
+                        <select id="todoGroup" style="flex: 1;">
+                            <option value="">グループを選択</option>
+                            <option value="__new__">+ 新しいグループを作成</option>
+                        </select>
+                        <button id="manageGroupsBtn" class="btn-secondary" style="padding: 0.5rem 1rem;">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-calendar calendar-icon" id="calendarIconBtn" style="cursor: pointer;"></i> 日程
+                    </label>
+                    <input type="text" id="todoDueDate" readonly placeholder="日程を選択">
+                    <div id="inlineCalendar" class="inline-calendar" style="display: none;"></div>
+                </div>
+                <div class="form-group">
+                    <label>時間</label>
+                    <select id="todoTime">
+                        <option value="">時間を選択</option>
+                        <option value="00:00">00:00</option>
+                        <option value="01:00">01:00</option>
+                        <option value="02:00">02:00</option>
+                        <option value="03:00">03:00</option>
+                        <option value="04:00">04:00</option>
+                        <option value="05:00">05:00</option>
+                        <option value="06:00">06:00</option>
+                        <option value="07:00">07:00</option>
+                        <option value="08:00">08:00</option>
+                        <option value="09:00">09:00</option>
+                        <option value="10:00">10:00</option>
+                        <option value="11:00">11:00</option>
+                        <option value="12:00">12:00</option>
+                        <option value="13:00">13:00</option>
+                        <option value="14:00">14:00</option>
+                        <option value="15:00">15:00</option>
+                        <option value="16:00">16:00</option>
+                        <option value="17:00">17:00</option>
+                        <option value="18:00">18:00</option>
+                        <option value="19:00">19:00</option>
+                        <option value="20:00">20:00</option>
+                        <option value="21:00">21:00</option>
+                        <option value="22:00">22:00</option>
+                        <option value="23:00">23:00</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>メモ</label>
+                    <textarea id="todoNotes" rows="3" placeholder="メモ(任意)"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelTodo" class="btn-secondary">キャンセル</button>
+                <button id="saveTodo" class="btn-primary">保存</button>
+                <button id="updateTodo" class="btn-primary" style="display: none;">更新</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="groupModal" class="modal">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h3><i class="fas fa-folder"></i> グループ管理</h3>
+                <button class="close-btn" id="closeGroupModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <ul id="groupList" class="group-list">
+                    </ul>
+            </div>
+            <div class="modal-footer">
+                <button id="doneGroupModal" class="btn-primary">完了</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="garbageModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-trash-alt"></i> ゴミの日設定</h3>
+                <button class="close-btn" id="closeGarbageModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                
+                <div class="form-group" id="garbageRuleListContainer">
+                    </div>
+
+                <hr style="border-color: var(--bg-tertiary); margin-bottom: var(--spacing-md);">
+
+                <h4 style="color: var(--neon-blue); margin-bottom: var(--spacing-sm);">新しいルールを追加</h4>
+                <div class="form-group">
+                    <label>ゴミの種類</label>
+                    <select id="garbageType">
+                        <option value="古紙">古紙</option>
+                        <option value="焼却">焼却</option>
+                        <option value="陶器">陶器</option>
+                        <option value="プラ">プラ</option>
+                        <option value="ペット">ペット</option>
+                        <option value="缶">缶</option>
+                        <option value="ビン">ビン</option>
+                        <option value="破砕">破砕</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>繰り返しの設定</label>
+                    <select id="garbageRepeatType">
+                        <option value="none">繰り返しなし</option>
+                        <option value="weekly">毎週 (基準日の曜日)</option>
+                        <option value="weekly-tue-fri">毎週 火・金曜日</option>
+                        <option value="monthly-date">毎月 (基準日と同じ日付)</option>
+                        <option value="monthly-day">毎月 (基準日と同じ第N・曜日)</option>
+                        <option value="monthly-1-wed">毎月 第1 水曜日</option>
+                        <option value="monthly-1-3-mon">毎月 第1・第3 月曜日</option>
+                        <option value="monthly-2-thu">毎月 第2 木曜日</option>
+                        <option value="monthly-2-4-5-mon">毎月 第2・第4・第5 月曜日</option>
+                        <option value="monthly-3-wed">毎月 第3 水曜日</option>
+                        <option value="monthly-3-thu">毎月 第3 木曜日</option>
+                        <option value="monthly-4-thu">毎月 第4 木曜日</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>基準日（この日を開始日とします）</label>
+                    <input type="date" id="garbageDate">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="saveGarbage" class="btn-primary">追加</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="sheetModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-table"></i> スプレッドシートを追加</h3>
+                <button class="close-btn" id="closeSheetModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>シート名</label>
+                    <input type="text" id="sheetName" placeholder="例: 家計簿">
+                </div>
+                <div class="form-group">
+                    <label>スプレッドシートURL</label>
+                    <input type="text" id="sheetUrl" placeholder="GoogleスプレッドシートのURLを貼り付け">
+                    <small>フルURLを貼り付けると自動的にIDを抽出します</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelSheet" class="btn-secondary">キャンセル</button>
+                <button id="saveSheet" class="btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
     
-    /* Neon Accent Colors */
-    --neon-blue: #00d4ff;
-    --neon-purple: #b84fff;
-    --neon-pink: #ff006e;
-    --neon-green: #00ff88;
-    --neon-yellow: #ffee00;
-    --neon-orange: #ff9500;
-    
-    /* Text Colors */
-    --text-primary: #ffffff;
-    --text-secondary: #a0a0c0;
-    --text-muted: #6b6b8e;
-    
-    /* Functional Colors */
-    --success: #00ff88;
-    --warning: #ffee00;
-    --danger: #ff006e;
-    --info: #00d4ff;
-
-    --light-orange: #FFDAB9; 
-    
-    /* Shadows */
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
-    --glow-blue: 0 0 20px rgba(0, 212, 255, 0.5);
-    --glow-purple: 0 0 20px rgba(184, 79, 255, 0.5);
-    
-    /* Spacing */
-    --spacing-xs: 0.5rem;
-    --spacing-sm: 1rem;
-    --spacing-md: 1.5rem;
-    --spacing-lg: 2rem;
-    --spacing-xl: 3rem;
-    
-    /* Border Radius */
-    --radius-sm: 8px;
-    --radius-md: 12px;
-    --radius-lg: 16px;
-    --radius-xl: 24px;
-
-    /* Garbage Colors */
-    --garbage-koshi: #FFEB3B; /* 黄色 */
-    --garbage-shokyaku: #FF9800; /* オレンジ */
-    --garbage-toki: #F44336; /* 赤 */
-    --garbage-pura: #E91E63; /* ピンク */
-    --garbage-petto: #4CAF50; /* 緑 */
-    --garbage-kan: #9E9E9E; /* 灰色 */
-    --garbage-bin: #03A9F4; /* 水色 */
-    --garbage-hasai: #9C27B0; /* 紫 */
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #2a2a2a;
-    color: var(--text-primary);
-    min-height: 100vh;
-    line-height: 1.6;
-}
-
-.container {
-    max-width: 1920px;
-    margin: 0 auto;
-    padding: var(--spacing-md);
-}
-
-/* ========================================
-   Header - With Weather & Timer
-   ======================================== */
-
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--spacing-md);
-    background: var(--bg-secondary);
-    border-radius: var(--radius-lg);
-    margin-bottom: var(--spacing-md);
-    box-shadow: var(--shadow-md);
-    border: 1px solid rgba(0, 212, 255, 0.2);
-    gap: var(--spacing-md);
-    flex-wrap: nowrap;
-    height: 80px;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
-
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-}
-
-.header-right {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-md);
-    margin-left: auto;
-}
-
-.logo {
-    font-size: 1.5rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-purple) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-    white-space: nowrap;
-}
-
-.logo i {
-    background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-purple) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-/* Header Weather Mini */
-.header-weather {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    background: var(--bg-tertiary);
-    padding: 0.5rem var(--spacing-sm);
-    border-radius: var(--radius-md);
-    min-width: 280px;
-}
-
-.weather-tabs-mini {
-    display: flex;
-    gap: 0.25rem;
-}
-
-.tab-btn-mini {
-    padding: 0.3rem 0.6rem;
-    background: var(--bg-primary);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-sm);
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 0.75rem;
-}
-
-.tab-btn-mini:hover {
-    border-color: var(--neon-blue);
-    color: var(--neon-blue);
-}
-
-.tab-btn-mini.active {
-    background: linear-gradient(135deg, var(--neon-purple) 0%, var(--neon-pink) 100%);
-    color: white;
-    border-color: var(--neon-purple);
-}
-
-.weather-content-mini {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.85rem;
-    color: var(--neon-yellow);
-    min-width: 120px;
-}
-
-/* Header Timer Mini */
-.header-timer {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    background: var(--bg-tertiary);
-    padding: 0.5rem var(--spacing-sm);
-    border-radius: var(--radius-md);
-    min-width: 280px;
-}
-
-.timer-switch-mini {
-    display: flex;
-    gap: 0.25rem;
-}
-
-.switch-btn-mini {
-    padding: 0.3rem 0.5rem;
-    background: var(--bg-primary);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-sm);
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 0.7rem;
-}
-
-.switch-btn-mini:hover {
-    color: var(--neon-purple);
-}
-
-.switch-btn-mini.active {
-    background: var(--neon-purple);
-    color: white;
-    border-color: var(--neon-purple);
-}
-
-.timer-display-mini {
-    font-size: 0.9rem;
-    font-weight: 700;
-    font-family: 'Courier New', monospace;
-    color: var(--neon-green);
-    min-width: 90px;
-    cursor: pointer;
-}
-
-.timer-display-mini:hover {
-    color: var(--neon-blue);
-}
-
-.timer-controls-mini {
-    display: flex;
-    gap: 0.25rem;
-}
-
-.control-btn-mini {
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    background: var(--bg-primary);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-sm);
-    color: var(--neon-green);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 0.8rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.control-btn-mini:hover {
-    background: var(--neon-green);
-    color: var(--bg-primary);
-}
-
-.header-info {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-md);
-    min-width: 220px;
-}
-
-.datetime-container {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    align-items: flex-start;
-}
-
-.current-date {
-    font-size: 1rem;
-    font-weight: 500;
-    color: white;
-    opacity: 0.9;
-}
-
-.current-time {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: white;
-    min-width: 160px;
-}
-
-.current-time i {
-    font-size: 1.1rem;
-    display: flex;
-    align-items: center;
-}
-
-.current-time #timeDisplay {
-    font-family: 'Courier New', monospace;
-    letter-spacing: 0.05em;
-}
-
-.gmail-count {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-    padding: 0.4rem var(--spacing-sm);
-    background: var(--bg-tertiary);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--neon-pink);
-    box-shadow: 0 0 15px rgba(255, 0, 110, 0.3);
-    text-decoration: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.gmail-count:hover {
-    background: var(--bg-hover);
-    transform: scale(1.05);
-    box-shadow: 0 0 20px rgba(255, 0, 110, 0.5);
-}
-
-.gmail-count i {
-    color: var(--neon-pink);
-    font-size: 1rem;
-}
-
-.gmail-count span {
-    font-weight: 700;
-    color: var(--neon-pink);
-    font-size: 1rem;
-}
-
-/* ========================================
-   Widget Base Styles
-   ======================================== */
-
-.widget {
-    background: var(--bg-secondary);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-md);
-    box-shadow: var(--shadow-md);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    transition: all 0.3s ease;
-    margin-bottom: var(--spacing-md);
-}
-
-.widget:hover {
-    border-color: rgba(0, 212, 255, 0.3);
-    box-shadow: var(--shadow-lg), var(--glow-blue);
-}
-
-.widget-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--spacing-md);
-    padding-bottom: var(--spacing-sm);
-    border-bottom: 2px solid var(--bg-tertiary);
-    gap: var(--spacing-sm);
-}
-
-.widget-header h2 {
-    font-size: 1.2rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-    color: var(--text-primary);
-    flex-shrink: 0;
-}
-
-.widget-header i {
-    color: var(--neon-blue);
-    text-shadow: var(--glow-blue);
-}
-
-/* ========================================
-   Quick Links
-   ======================================== */
-.quick-links {
-    display: flex;
-    gap: var(--spacing-xs);
-    align-items: center;
-    flex-grow: 1;
-    justify-content: center;
-    overflow-x: auto; 
-}
-
-.quick-links a {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-    padding: 0.5rem 0.8rem;
-    background: var(--bg-tertiary);
-    border-radius: var(--radius-sm);
-    color: var(--text-secondary);
-    text-decoration: none;
-    transition: all 0.3s ease;
-    font-size: 0.85rem;
-    font-weight: 600;
-    border: 1px solid var(--bg-tertiary);
-    white-space: nowrap;
-}
-
-.quick-links a:hover {
-    background: var(--bg-hover);
-    color: var(--text-primary);
-    border-color: var(--neon-blue);
-}
-
-.quick-links a[data-icon="udemy"] i { color: #A435F0; }
-.quick-links a[data-icon="jdla"] i { color: #00AEEF; }
-.quick-links a[data-icon="ai-pass"] i { color: #f0c30e; }
-.quick-links a[data-icon="ga"] i { color: #E8710A; }
-.quick-links a[data-icon="ads"] i { color: #4285F4; }
-
-
-/* ========================================
-   Todo Widget - Full Width
-   ======================================== */
-
-.todo-widget-full {
-    min-height: 150px;
-}
-
-.todo-list-horizontal {
-    display: flex;
-    gap: var(--spacing-sm);
-    overflow-x: auto;
-    padding: var(--spacing-sm);
-    background: #3a3a3a;
-    border-radius: var(--radius-sm);
-}
-
-.todo-item {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-sm);
-    background: var(--bg-tertiary);
-    border-radius: var(--radius-sm);
-    transition: all 0.3s ease;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    min-width: 250px;
-    flex-shrink: 0;
-}
-
-.todo-item:hover {
-    background: var(--bg-hover);
-    border-color: rgba(184, 79, 255, 0.3);
-    transform: translateY(-2px);
-}
-
-.todo-checkbox {
-    width: 20px;
-    height: 20px;
-    margin-top: 2px;
-    cursor: pointer;
-    accent-color: var(--neon-purple);
-    flex-shrink: 0;
-}
-
-.todo-content {
-    flex: 1;
-}
-
-.todo-title {
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-    font-size: 1.1rem;
-}
-
-.todo-meta {
-    display: flex;
-    gap: var(--spacing-xs);
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    margin-top: 0.25rem;
-    flex-wrap: wrap;
-}
-
-.todo-group {
-    color: var(--neon-orange);
-}
-
-.todo-due {
-    color: var(--neon-yellow);
-}
-
-.todo-time {
-    color: var(--neon-green);
-}
-
-.todo-actions {
-    display: flex;
-    gap: 0.5rem;
-    flex-shrink: 0;
-}
-
-.todo-edit,
-.todo-delete {
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    cursor: pointer;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    padding: 0.25rem;
-}
-
-.todo-edit:hover {
-    color: var(--neon-blue);
-}
-
-.todo-delete:hover {
-    color: var(--danger);
-}
-
-.todo-item.completed .todo-title {
-    text-decoration: line-through;
-    opacity: 0.5;
-}
-
-.todo-controls {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    flex-shrink: 0;
-}
-
-.sort-dropdown {
-    position: relative;
-}
-
-.sort-btn {
-    padding: var(--spacing-xs) var(--spacing-sm);
-    background: var(--bg-tertiary);
-    border: 1px solid rgba(0, 212, 255, 0.3);
-    border-radius: var(--radius-sm);
-    color: var(--neon-blue);
-    cursor: pointer;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-    transition: all 0.3s ease;
-    font-size: 0.9rem;
-}
-
-.sort-btn:hover {
-    background: var(--bg-hover);
-    border-color: var(--neon-blue);
-    box-shadow: var(--glow-blue);
-}
-
-.sort-menu {
-    position: absolute;
-    top: calc(100% + 5px);
-    left: 0;
-    background: var(--bg-secondary);
-    border: 1px solid rgba(0, 212, 255, 0.3);
-    border-radius: var(--radius-sm);
-    box-shadow: var(--shadow-lg);
-    min-width: 180px;
-    z-index: 1000;
-    overflow: hidden;
-}
-
-.sort-option {
-    width: 100%;
-    padding: var(--spacing-sm);
-    background: transparent;
-    border: none;
-    color: var(--text-primary);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-    transition: all 0.3s ease;
-    font-size: 0.9rem;
-    text-align: left;
-}
-
-.sort-option:hover {
-    background: var(--bg-hover);
-    color: var(--neon-blue);
-}
-
-.sort-option.active {
-    background: var(--bg-hover);
-    color: var(--neon-purple);
-    font-weight: 600;
-}
-
-.add-btn {
-    padding: var(--spacing-xs) var(--spacing-sm);
-    background: linear-gradient(135deg, var(--neon-purple) 0%, var(--neon-pink) 100%);
-    border: none;
-    border-radius: var(--radius-sm);
-    color: white;
-    cursor: pointer;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-    transition: all 0.3s ease;
-    font-size: 0.9rem;
-}
-
-.add-btn:hover {
-    box-shadow: 0 0 20px rgba(184, 79, 255, 0.6);
-    transform: scale(1.05);
-}
-
-/* ========================================
-   Calendar Widget - Full Width
-   ======================================== */
-
-.calendar-widget-full {
-    min-height: 600px;
-}
-
-.calendar-nav {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    margin-left: auto;
-}
-
-#openGarbageModalBtn {
-    background: linear-gradient(135deg, var(--neon-purple) 0%, var(--neon-pink) 100%);
-    color: white;
-}
-#openGarbageModalBtn:hover {
-    box-shadow: 0 0 20px rgba(184, 79, 255, 0.6);
-    transform: scale(1.05);
-}
-
-
-.nav-btn {
-    background: var(--bg-tertiary);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--text-primary);
-    width: 32px;
-    height: 32px;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.nav-btn:hover {
-    background: var(--bg-hover);
-    border-color: var(--neon-blue);
-    color: var(--neon-blue);
-}
-
-.current-month {
-    font-size: 1.1rem;
-    font-weight: 600;
-    min-width: 150px;
-    text-align: center;
-}
-
-.calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: var(--spacing-sm);
-}
-
-.calendar-day-header {
-    text-align: center;
-    padding: var(--spacing-sm);
-    font-weight: 700;
-    color: white;
-    font-size: 1.25rem;
-}
-
-.calendar-day {
-    aspect-ratio: 1 / 0.9;
-    height: auto; 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    padding: var(--spacing-sm);
-    background: #3a3a3a;
-    border-radius: var(--radius-sm);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-    /* ★修正：スクロールバー削除 */
-    overflow-y: hidden;
-}
-
-.calendar-day .add-event-btn {
-    display: none;
-    position: absolute;
-    top: 5px;
-    left: 5px;
-    background: var(--neon-purple);
-    border: none;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    color: white;
-    cursor: pointer;
-    font-size: 0.8rem;
-    transition: all 0.3s ease;
-    z-index: 5; 
-}
-
-.calendar-day:hover .add-event-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.calendar-day .add-event-btn:hover {
-    background: var(--neon-pink);
-    transform: scale(1.1);
-}
-
-.calendar-day:hover {
-    background: var(--bg-hover);
-    border-color: var(--neon-blue);
-    transform: scale(1.02);
-}
-
-.calendar-day.today {
-    background: rgba(255, 182, 193, 0.2);
-    border: 2px solid #ff006e;
-    box-shadow: 0 0 10px rgba(255, 0, 110, 0.3);
-}
-
-.calendar-day.other-month {
-    opacity: 0.3;
-}
-
-/* ★修正：CSS Gridで日付とゴミ箱を配置 */
-.day-header-flex {
-    display: grid;
-    /* 左(追加ボタン用 28px), 中央(日付), 右(ゴミ箱 自動幅) */
-    grid-template-columns: 28px 1fr auto; 
-    align-items: flex-start; 
-    width: 100%;
-    margin-bottom: 0.5rem;
-    min-height: 2.5rem; /* ゴミの日の高さ(1行分)を確保 */
-}
-
-.day-number {
-    font-weight: 700;
-    font-size: 1.5rem;
-    grid-column: 2 / 3; 
-    text-align: center;
-    z-index: 1;
-    padding-top: 4px; /* アイコンと被らないよう微調整 */
-}
-
-.garbage-icons {
-    grid-column: 3 / 4; 
-    display: flex;
-    flex-direction: row; /* ★横並び */
-    flex-wrap: wrap; /* ★折り返し */
-    gap: 4px; 
-    align-items: flex-start; 
-    justify-content: flex-end; /* ★右寄せ */
-    z-index: 2;
-    padding-right: 4px; 
-}
-
-.garbage-item {
-    display: flex;
-    align-items: center;
-    gap: 4px; 
-    font-size: 1rem; 
-    border: 2px solid; 
-    padding: 2px 6px; 
-    border-radius: var(--radius-sm); 
-    background: rgba(0,0,0,0.3); 
-}
-
-.garbage-item[data-type="古紙"] { border-color: var(--garbage-koshi); }
-.garbage-item[data-type="焼却"] { border-color: var(--garbage-shokyaku); }
-.garbage-item[data-type="陶器"] { border-color: var(--garbage-toki); }
-.garbage-item[data-type="プラ"] { border-color: var(--garbage-pura); }
-.garbage-item[data-type="ペット"] { border-color: var(--garbage-petto); }
-.garbage-item[data-type="缶"] { border-color: var(--garbage-kan); }
-.garbage-item[data-type="ビン"] { border-color: var(--garbage-bin); }
-.garbage-item[data-type="破砕"] { border-color: var(--garbage-hasai); }
-
-
-.garbage-icon {
-    font-size: 1rem;
-    text-shadow: 0 0 5px rgba(0,0,0,0.5);
-    flex-shrink: 0;
-}
-.garbage-icon[data-type="古紙"] { color: var(--garbage-koshi); }
-.garbage-icon[data-type="焼却"] { color: var(--garbage-shokyaku); }
-.garbage-icon[data-type="陶器"] { color: var(--garbage-toki); }
-.garbage-icon[data-type="プラ"] { color: var(--garbage-pura); }
-.garbage-icon[data-type="ペット"] { color: var(--garbage-petto); }
-.garbage-icon[data-type="缶"] { color: var(--garbage-kan); }
-.garbage-icon[data-type="ビン"] { color: var(--garbage-bin); }
-.garbage-icon[data-type="破砕"] { color: var(--garbage-hasai); }
-
-.garbage-text {
-    font-size: 0.95rem; 
-    font-weight: 600;
-    color: var(--text-primary);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.day-events {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    width: 100%;
-    font-size: 0.9rem;
-    margin-top: 0.5rem;
-}
-
-.event-dot {
-    width: 100%;
-    padding: 5px 8px;
-    background: rgba(0, 212, 255, 0.3);
-    border-radius: 4px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-align: left;
-    font-size: 0.85rem;
-    border-left: 3px solid var(--neon-blue);
-    color: var(--text-primary);
-}
-
-
-/* ========================================
-   Spreadsheet Widget - Full Width
-   ======================================== */
-
-.spreadsheet-widget-full {
-    min-height: 600px;
-}
-
-.sheet-tabs {
-    display: flex;
-    gap: var(--spacing-xs);
-    margin-bottom: var(--spacing-sm);
-    overflow-x: auto;
-    padding-bottom: var(--spacing-xs);
-}
-
-.sheet-tab {
-    padding: var(--spacing-xs) var(--spacing-sm);
-    background: var(--bg-tertiary);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-sm);
-    color: var(--text-secondary);
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-    font-size: 0.9rem;
-}
-
-.sheet-tab:hover {
-    background: var(--bg-hover);
-    border-color: var(--neon-green);
-}
-
-.sheet-tab.active {
-    background: var(--neon-green);
-    border-color: var(--neon-green);
-    color: var(--bg-primary);
-    box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
-}
-
-.sheet-tab .delete-sheet {
-    margin-left: var(--spacing-xs);
-    background: none;
-    border: none;
-    color: inherit;
-    cursor: pointer;
-    padding: 0;
-    font-size: 0.9rem;
-}
-
-.sheet-tab .delete-sheet:hover {
-    color: var(--danger);
-}
-
-.sheet-content {
-    min-height: 1200px;
-    background: var(--bg-tertiary);
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-}
-
-.sheet-content iframe {
-    width: 100%;
-    height: 1200px;
-    border: none;
-}
-
-.empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 1200px;
-    color: var(--text-muted);
-}
-
-.empty-state i {
-    font-size: 4rem;
-    margin-bottom: var(--spacing-md);
-    opacity: 0.3;
-}
-
-/* ========================================
-   Modal
-   ======================================== */
-
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(5px);
-    z-index: 1000;
-    align-items: center;
-    justify-content: center;
-}
-
-.modal.active {
-    display: flex;
-}
-
-.modal-content {
-    background: var(--bg-secondary);
-    border-radius: var(--radius-lg);
-    max-width: 500px;
-    width: 90%;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: var(--shadow-lg), 0 0 50px rgba(0, 212, 255, 0.3);
-    border: 1px solid rgba(0, 212, 255, 0.3);
-}
-
-.modal-small {
-    max-width: 350px;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--spacing-md);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.modal-header h3 {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-    color: var(--neon-blue);
-}
-
-.close-btn {
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    font-size: 1.5rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.close-btn:hover {
-    color: var(--danger);
-    transform: rotate(90deg);
-}
-
-.modal-body {
-    padding: var(--spacing-md);
-}
-
-.modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-md);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* グループ管理リスト */
-.group-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    max-height: 300px;
-    overflow-y: auto;
-}
-.group-list li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--spacing-sm);
-    background: var(--bg-tertiary);
-    border-radius: var(--radius-sm);
-    margin-bottom: var(--spacing-xs);
-    color: var(--text-primary);
-}
-.group-list .delete-group-btn {
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    font-size: 1rem;
-    cursor: pointer;
-    transition: color 0.3s ease;
-}
-.group-list .delete-group-btn:hover {
-    color: var(--danger);
-}
-
-/* ゴミの日ルール管理リスト */
-#garbageRuleListContainer {
-    max-height: 200px;
-    overflow-y: auto;
-    padding: var(--spacing-xs);
-    background: var(--bg-primary);
-    border-radius: var(--radius-sm);
-}
-#garbageRuleListContainer h3 {
-    color: var(--neon-blue);
-    margin-bottom: var(--spacing-sm);
-    padding-left: var(--spacing-xs);
-}
-.garbage-rule-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-.garbage-rule-list li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--spacing-sm);
-    background: var(--bg-tertiary);
-    border-radius: var(--radius-sm);
-    margin-bottom: var(--spacing-xs);
-    color: var(--text-primary);
-}
-.garbage-rule-list .delete-rule-btn {
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    font-size: 1rem;
-    cursor: pointer;
-    transition: color 0.3s ease;
-}
-.garbage-rule-list .delete-rule-btn:hover {
-    color: var(--danger);
-}
-
-
-/* ========================================
-   Form Elements
-   ======================================== */
-
-.form-group {
-    margin-bottom: var(--spacing-md);
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: var(--spacing-xs);
-    font-weight: 600;
-    color: var(--text-primary);
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-}
-
-input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1) brightness(1.2); 
-    font-size: 1.2rem; 
-    cursor: pointer;
-    opacity: 0.8;
-}
-input[type="date"]::-webkit-calendar-picker-indicator:hover {
-    opacity: 1.0;
-}
-
-
-.calendar-icon {
-    color: #ffffff;
-    font-size: 1.8rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.calendar-icon:hover {
-    color: var(--neon-blue);
-    transform: scale(1.1);
-}
-
-/* Inline Calendar Picker */
-.inline-calendar {
-    margin-top: var(--spacing-sm);
-    background: var(--bg-tertiary);
-    padding: var(--spacing-sm);
-    border-radius: var(--radius-md);
-    border: 1px solid rgba(0, 212, 255, 0.3);
-}
-
-.inline-calendar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--spacing-sm);
-}
-
-.inline-calendar-header button {
-    background: var(--bg-primary);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--text-primary);
-    padding: 0.3rem 0.6rem;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.inline-calendar-header button:hover {
-    border-color: var(--neon-blue);
-    color: var(--neon-blue);
-}
-
-.inline-calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 0.25rem;
-}
-
-.inline-calendar-day {
-    padding: 0.5rem;
-    text-align: center;
-    background: var(--bg-primary);
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 0.85rem;
-}
-
-.inline-calendar-day:hover {
-    background: var(--bg-hover);
-    color: var(--neon-blue);
-}
-
-.inline-calendar-day.today {
-    background: var(--neon-blue);
-    color: white;
-}
-
-.inline-calendar-day.selected {
-    background: var(--neon-purple);
-    color: white;
-}
-
-.inline-calendar-day.other-month {
-    opacity: 0.3;
-}
-
-.time-inputs {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-    justify-content: center;
-}
-
-.time-inputs select {
-    padding: var(--spacing-sm);
-    background: var(--bg-tertiary);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-sm);
-    color: var(--text-primary);
-    font-size: 1.2rem;
-    text-align: center;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-}
-
-.time-inputs select:focus {
-    outline: none;
-    border-color: var(--neon-blue);
-    box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
-}
-
-.time-inputs span {
-    font-size: 1.5rem;
-    color: var(--text-secondary);
-}
-
-.form-group input[type="text"],
-.form-group input[type="date"],
-.form-group input[type="time"],
-.form-group select,
-.form-group textarea {
-    width: 100%;
-    padding: var(--spacing-sm);
-    background: var(--bg-tertiary);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-sm);
-    color: var(--text-primary);
-    font-size: 1rem;
-    transition: all 0.3s ease;
-}
-
-.form-group input[readonly] {
-    cursor: pointer;
-    background: var(--bg-tertiary);
-    border: 1px solid var(--neon-blue);
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-    outline: none;
-    border-color: var(--neon-blue);
-    box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
-}
-
-.form-group small {
-    display: block;
-    margin-top: var(--spacing-xs);
-    font-size: 0.85rem;
-    color: var(--text-muted);
-}
-
-.checkbox-group {
-    display: flex;
-    align-items: center;
-}
-
-.checkbox-group label {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-    cursor: pointer;
-    margin: 0;
-}
-
-.checkbox-group input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-    accent-color: var(--neon-blue);
-}
-
-.btn-primary,
-.btn-secondary {
-    padding: var(--spacing-sm) var(--spacing-lg);
-    border: none;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-purple) 100%);
-    color: white;
-}
-
-.btn-primary:hover {
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
-    transform: scale(1.05);
-}
-
-.btn-secondary {
-    background: var(--bg-tertiary);
-    color: var(--text-primary);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.btn-secondary:hover {
-    background: var(--bg-hover);
-    border-color: var(--text-primary);
-}
-
-/* ========================================
-   Loading & Empty States
-   ======================================== */
-
-.loading {
-    text-align: center;
-    padding: var(--spacing-xl);
-    color: var(--text-muted);
-    font-style: italic;
-}
-
-.loading::after {
-    content: '...';
-    animation: loading 1.5s infinite;
-}
-
-@keyframes loading {
-    0%, 20% { content: '.'; }
-    40% { content: '..'; }
-    60%, 100% { content: '...'; }
-}
-
-/* ========================================
-   Scrollbar Styling
-   ======================================== */
-
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--bg-tertiary);
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--neon-blue);
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: var(--neon-purple);
-}
-
-/* ========================================
-   Responsive Design
-   ======================================== */
-
-@media (max-width: 1024px) {
-    .header {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .header-weather,
-    .header-timer {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .logo {
-        font-size: 1.2rem;
-    }
-    
-    .calendar-day {
-        aspect-ratio: 1 / 0.9;
-        min-height: auto; 
-    }
-}
-
-@media (max-width: 768px) {
-    .container {
-        padding: var(--spacing-sm);
-    }
-    
-    .widget {
-        padding: var(--spacing-sm);
-    }
-    
-    .todo-list-horizontal {
-        flex-direction: column;
-    }
-    
-    .todo-item {
-        min-width: 100%;
-    }
-
-    .quick-links a {
-        padding: 0.4rem 0.6rem;
-        font-size: 0.75rem;
-    }
-
-    .widget-header {
-        flex-wrap: wrap; 
-    }
-    .quick-links {
-        width: 100%; 
-        justify-content: space-around;
-        order: 3; 
-        padding-top: var(--spacing-sm);
-    }
-    .widget-header h2 {
-        order: 1;
-    }
-    .todo-controls {
-        order: 2;
-        margin-left: auto; 
-    }
-
-    .day-header-flex {
-        flex-direction: column; 
-        align-items: center; 
-        gap: 2px;
-        height: auto; 
-    }
-    .day-number {
-        position: static; 
-        transform: none;
-        width: auto;
-        font-size: 1.3rem; 
-    }
-    .garbage-icons {
-        position: static; 
-        flex-direction: row; 
-        gap: 6px;
-        justify-content: center; 
-    }
-    .garbage-text {
-        display: none; 
-    }
-    .garbage-item {
-        border: none; 
-        padding: 0;
-        background: none;
-    }
-    .garbage-icon {
-        font-size: 0.9rem; 
-    }
-}
+    <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+    <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
+
+</body>
+</html>
