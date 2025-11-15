@@ -27,6 +27,9 @@
     --warning: #ffee00;
     --danger: #ff006e;
     --info: #00d4ff;
+
+    /* ★新機能：淡いオレンジ */
+    --light-orange: #FFDAB9; /* ピーチパフ */
     
     /* Shadows */
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -669,7 +672,10 @@ body {
 }
 
 .calendar-day {
-    min-height: 120px;
+    /* ★修正：アスペクト比を1:1（正方形）に */
+    aspect-ratio: 1 / 1;
+    height: auto; /* min-heightから変更 */
+
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -688,7 +694,8 @@ body {
     display: none;
     position: absolute;
     top: 5px;
-    right: 5px;
+    /* ★修正：ゴミ箱と被らないように左上に変更 */
+    left: 5px;
     background: var(--neon-purple);
     border: none;
     border-radius: 50%;
@@ -698,6 +705,7 @@ body {
     cursor: pointer;
     font-size: 0.8rem;
     transition: all 0.3s ease;
+    z-index: 5; /* ゴミ箱より手前に */
 }
 
 .calendar-day:hover .add-event-btn {
@@ -730,17 +738,23 @@ body {
 /* ★修正：日付とゴミの日アイコンを横並びにするコンテナ */
 .day-header-flex {
     display: flex;
-    align-items: center;
-    justify-content: flex-start; /* 左寄せに変更 */
-    gap: var(--spacing-xs);
+    align-items: flex-start; /* 上揃え */
+    justify-content: flex-start; /* 左寄せ */
     width: 100%;
     margin-bottom: 0.5rem;
+    position: relative; /* 子要素のabsoluteの基準点 */
+    height: 36px; /* ヘッダーの高さをある程度確保 */
 }
 
 .day-number {
     font-weight: 700;
     font-size: 1.3rem;
-    flex-shrink: 0; /* 数字が縮まないように */
+    /* ★修正：中央寄せ */
+    width: 100%;
+    text-align: center;
+    position: absolute; /* 中央に配置 */
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 /* ★修正：ゴミの日アイコンコンテナ */
@@ -749,8 +763,11 @@ body {
     flex-direction: column; /* 縦に並べる */
     gap: 2px;
     flex-wrap: wrap; 
-    flex: 1; 
-    margin-left: 1em; /* ★全角1文字分のマージンを追加 */
+    /* ★修正：右端に配置 */
+    position: absolute;
+    top: 0;
+    right: 0;
+    align-items: flex-end; /* アイテムを右揃えに */
 }
 
 /* ★修正：ゴミの日アイテム（アイコン＋テキスト） */
@@ -758,11 +775,14 @@ body {
     display: flex;
     align-items: center;
     gap: 4px; /* アイコンとテキストの間隔 */
+    /* ★修正：サイズアップ */
+    font-size: 0.95rem; 
 }
 
 /* ★修正：ゴミの日アイコン */
 .garbage-icon {
-    font-size: 0.9rem; /* 少し小さく */
+    /* ★修正：サイズアップ */
+    font-size: 1rem;
     text-shadow: 0 0 5px rgba(0,0,0,0.5);
     flex-shrink: 0;
 }
@@ -775,12 +795,12 @@ body {
 .garbage-icon[data-type="ビン"] { color: var(--garbage-bin); }
 .garbage-icon[data-type="破砕"] { color: var(--garbage-hasai); }
 
-/* ★新機能：ゴミの日テキスト */
+/* ★修正：ゴミの日テキスト */
 .garbage-text {
-    font-size: 0.85rem;
+    /* ★修正：サイズアップ */
+    font-size: 0.9rem;
     font-weight: 600;
     color: var(--text-primary);
-    /* 文字が見切れないように */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1022,12 +1042,17 @@ body {
     gap: var(--spacing-xs);
 }
 
-/* ★新機能：ゴミの日モーダルの日付ピッカーアイコンを白く・大きくする */
+/* ★修正：ゴミの日モーダルの日付ピッカーアイコンを白く・大きくする */
 input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(1) brightness(1.2); /* 色を反転（白）にし、少し明るく */
     font-size: 1.2rem; /* アイコンを少し大きく */
     cursor: pointer;
+    opacity: 0.8;
 }
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1.0;
+}
+
 
 .calendar-icon {
     color: #ffffff;
@@ -1291,7 +1316,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     }
     
     .calendar-day {
-        min-height: 80px;
+        /* 縦横比は維持 */
+        aspect-ratio: 1 / 1;
+        min-height: auto; /* min-heightをリセット */
     }
 }
 
@@ -1316,10 +1343,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         padding: 0.4rem 0.6rem;
         font-size: 0.75rem;
     }
-    /* ★修正：スマホではアイコン横のテキストも表示（スペースがあるため） */
-    /* .quick-links a span {
-        display: none; 
-    } */
+
     .widget-header {
         flex-wrap: wrap; 
     }
@@ -1337,16 +1361,23 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         margin-left: auto; 
     }
 
-    /* ★修正：スマホでのゴミの日表示 */
+    /* ★修正：スマホでのゴミの日表示（アイコンのみ） */
     .day-header-flex {
-        flex-direction: column; /* 日付とアイコンを縦積みに */
-        align-items: flex-start;
+        flex-direction: column; 
+        align-items: center; /* 数字を中央に */
         gap: 2px;
+        height: auto; /* 高さを自動に */
+    }
+    .day-number {
+        position: static; /* staticに戻す */
+        transform: none;
+        width: auto;
     }
     .garbage-icons {
-        margin-left: 0; /* 縦積みなのでマージン不要 */
+        position: static; /* staticに戻す */
         flex-direction: row; /* アイコン自体は横に並べる */
         gap: 6px;
+        justify-content: center; /* アイコンを中央寄せ */
     }
     .garbage-text {
         display: none; /* スマホではスペースがないのでテキストは非表示 */
