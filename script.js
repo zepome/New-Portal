@@ -1,5 +1,5 @@
 /* ========================================
-   Zepome's Portal - V4 Script (Display Fixes)
+   Zepome's Portal - V6 Script (Layout Fixes)
    ======================================== */
 
 // グローバル変数
@@ -80,10 +80,13 @@ function updateCurrentTime() {
         minute: '2-digit',
         second: '2-digit'
     });
+    
+    // ★修正：曜日の（）を追加
     const dateString = now.toLocaleDateString('ja-JP', {
         year: 'numeric',
         month: '2-digit',
-        day: '2-digit'
+        day: '2-digit',
+        weekday: 'short' // 'short'で (土) のような形式
     }).replace(/\//g, '/');
     
     const timeDisplay = document.getElementById('timeDisplay');
@@ -512,26 +515,22 @@ function createCalendarDay(day, isOtherMonth, year, month) {
     
     const dayGarbageEvents = getGarbageEventsForDate(dateStr, dateObj);
     
-    // ★修正：アイコンとテキストを両方表示
     dayGarbageEvents.forEach(event => {
-        // コンテナ（ <div class="garbage-item"> ）を作成
         const garbageItem = document.createElement('div');
         garbageItem.className = 'garbage-item';
-        garbageItem.title = event.title; // ホバーで名前を表示
+        garbageItem.title = event.title; 
+        garbageItem.dataset.type = event.title; // CSSで枠線の色を付けるため
 
-        // アイコン（ <i ...> ）を作成
         const icon = document.createElement('i');
         icon.className = 'fas fa-trash garbage-icon';
         icon.dataset.type = event.title;
         garbageItem.appendChild(icon);
 
-        // テキスト（ <span ...> ）を作成
         const text = document.createElement('span');
         text.className = 'garbage-text';
-        text.textContent = event.title; // ゴミの種類をテキストで表示
+        text.textContent = event.title; 
         garbageItem.appendChild(text);
 
-        // コンテナを日付ヘッダーに追加
         garbageIconsContainer.appendChild(garbageItem);
     });
     dayHeaderFlex.appendChild(garbageIconsContainer); 
