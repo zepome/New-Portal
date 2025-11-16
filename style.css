@@ -411,6 +411,7 @@ body {
 }
 
 .quick-links a[data-icon="udemy"] i { color: #A435F0; }
+.quick-links a[data-icon="ima"] i { color: #F58220; } /* ★追加 */
 .quick-links a[data-icon="jdla"] i { color: #00AEEF; }
 .quick-links a[data-icon="ai-pass"] i { color: #f0c30e; }
 .quick-links a[data-icon="ga"] i { color: #E8710A; }
@@ -694,8 +695,7 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
-    /* ★修正：スクロールバー削除 */
-    overflow-y: hidden;
+    overflow: hidden;
 }
 
 .calendar-day .add-event-btn {
@@ -742,34 +742,34 @@ body {
     opacity: 0.3;
 }
 
-/* ★修正：CSS Gridで日付とゴミ箱を配置 */
+/* ★修正：CSS Gridで日付(左)とゴミ箱(右)を配置 */
 .day-header-flex {
     display: grid;
-    /* 左(追加ボタン用 28px), 中央(日付), 右(ゴミ箱 自動幅) */
-    grid-template-columns: 28px 1fr auto; 
+    /* 左(日付+追加ボタン), 右(ゴミ箱) */
+    grid-template-columns: 1fr auto; 
     align-items: flex-start; 
     width: 100%;
     margin-bottom: 0.5rem;
-    min-height: 2.5rem; /* ゴミの日の高さ(1行分)を確保 */
+    min-height: 2.5rem; 
 }
 
 .day-number {
     font-weight: 700;
     font-size: 1.5rem;
-    grid-column: 2 / 3; 
-    text-align: center;
+    grid-column: 1 / 2; /* グリッドの左側 */
+    text-align: left;   /* ★左揃え */
     z-index: 1;
-    padding-top: 4px; /* アイコンと被らないよう微調整 */
+    padding-top: 4px; 
+    padding-left: 32px; /* ★+ボタン(24px)と余白(8px)分を確保 */
 }
 
 .garbage-icons {
-    grid-column: 3 / 4; 
+    grid-column: 2 / 3; /* グリッドの右側 */
     display: flex;
-    flex-direction: row; /* ★横並び */
-    flex-wrap: wrap; /* ★折り返し */
-    gap: 4px; 
-    align-items: flex-start; 
-    justify-content: flex-end; /* ★右寄せ */
+    flex-direction: column; 
+    gap: 2px;
+    flex-wrap: wrap; 
+    align-items: flex-end; 
     z-index: 2;
     padding-right: 4px; 
 }
@@ -926,6 +926,7 @@ body {
     margin-bottom: var(--spacing-md);
     opacity: 0.3;
 }
+
 
 /* ========================================
    Modal
@@ -1411,7 +1412,9 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
         margin-left: auto; 
     }
 
+    /* ★修正：スマホでのカレンダー日付・ゴミ表示 */
     .day-header-flex {
+        display: flex; /* gridではなくflexに戻す */
         flex-direction: column; 
         align-items: center; 
         gap: 2px;
@@ -1422,6 +1425,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
         transform: none;
         width: auto;
         font-size: 1.3rem; 
+        padding-left: 0; /* paddingリセット */
     }
     .garbage-icons {
         position: static; 
