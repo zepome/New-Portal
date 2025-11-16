@@ -410,12 +410,23 @@ body {
     border-color: var(--neon-blue);
 }
 
+/* ★新機能：リンクの区切り線 */
+.link-separator {
+    color: var(--text-muted);
+    font-size: 1rem;
+    padding: 0 0.2rem;
+    align-self: center;
+}
+
+/* アイコンの色分け */
 .quick-links a[data-icon="udemy"] i { color: #A435F0; }
-.quick-links a[data-icon="ima"] i { color: #F58220; } /* ★追加 */
+.quick-links a[data-icon="ima"] i { color: #F58220; } 
 .quick-links a[data-icon="jdla"] i { color: #00AEEF; }
 .quick-links a[data-icon="ai-pass"] i { color: #f0c30e; }
 .quick-links a[data-icon="ga"] i { color: #E8710A; }
 .quick-links a[data-icon="ads"] i { color: #4285F4; }
+.quick-links a[data-icon="gemini"] i { color: #4B89DA; } 
+.quick-links a[data-icon="notebooklm"] i { color: #B468EA; } 
 
 
 /* ========================================
@@ -1395,6 +1406,11 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
         font-size: 0.75rem;
     }
 
+    /* ★新機能：スマホで区切り線を非表示 */
+    .link-separator {
+        display: none;
+    }
+
     .widget-header {
         flex-wrap: wrap; 
     }
@@ -1412,9 +1428,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
         margin-left: auto; 
     }
 
-    /* ★修正：スマホでのカレンダー日付・ゴミ表示 */
     .day-header-flex {
-        display: flex; /* gridではなくflexに戻す */
+        display: flex; 
         flex-direction: column; 
         align-items: center; 
         gap: 2px;
@@ -1425,7 +1440,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
         transform: none;
         width: auto;
         font-size: 1.3rem; 
-        padding-left: 0; /* paddingリセット */
+        padding-left: 0; 
     }
     .garbage-icons {
         position: static; 
