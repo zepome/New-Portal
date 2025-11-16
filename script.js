@@ -1,5 +1,5 @@
 /* ========================================
-   Zepome's Portal - V9 Script (New Garbage Rules)
+   Zepome's Portal - V11 Script (Event Detail Modal)
    ======================================== */
 
 // グローバル変数
@@ -19,6 +19,7 @@ let isTimerRunning = false;
 let isStopwatchRunning = false;
 let editingTodoId = null; // 編集中のTodo ID
 let currentSortFilter = 'all'; // 現在のソートフィルター
+let currentDetailTodoId = null; // ★新機能：詳細モーダルで表示中のID
 
 // データストレージ
 let spreadsheets = JSON.parse(localStorage.getItem(STORAGE_KEYS.SPREADSHEETS) || '[]');
@@ -50,10 +51,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (gmailCountEl) {
             // Gmailアイコンのクリック動作
             gmailCountEl.addEventListener('click', (e) => {
-                if (!accessToken) { // もし認証トークンがまだ無いなら
-                    e.preventDefault(); // リンクを無効化
+                if (!accessToken) { 
+                    e.preventDefault(); 
                     console.log('Starting authentication...');
-                    handleAuthClick(); // 認証を開始
+                    handleAuthClick(); 
                 }
             });
         }
@@ -195,6 +196,18 @@ function setupEventListeners() {
     document.getElementById('cancelSheet').addEventListener('click', closeSheetModal);
     document.getElementById('saveSheet').addEventListener('click', saveSpreadsheet);
     
+    // ★新機能：イベント詳細モーダル
+    document.getElementById('closeEventDetailModal').addEventListener('click', closeEventDetailModal);
+    document.getElementById('eventDetailModal').addEventListener('click', (e) => {
+        if (e.target.id === 'eventDetailModal') closeEventDetailModal();
+    });
+    document.getElementById('editEventBtn').addEventListener('click', () => {
+        if (currentDetailTodoId) {
+            closeEventDetailModal();
+            openTodoModal(currentDetailTodoId); // 編集モーダルを開く
+        }
+    });
+
     // モーダル外クリックで閉じる
     document.getElementById('todoModal').addEventListener('click', (e) => {
         if (e.target.id === 'todoModal') closeTodoModal();
@@ -554,16 +567,23 @@ function createCalendarDay(day, isOtherMonth, year, month) {
         dayEl.appendChild(addBtn);
     }
     
+    // ★修正：Todoイベントを取得（IDも）
     const dayTodos = getTodosForDate(dateStr);
     
     if (dayTodos.length > 0) {
         const eventsContainer = document.createElement('div');
         eventsContainer.className = 'day-events';
-        dayTodos.forEach(event => {
+        // ★修正：クリックで詳細モーダルを開く
+        dayTodos.forEach(todo => {
             const eventDot = document.createElement('div');
             eventDot.className = 'event-dot';
-            eventDot.textContent = event.time ? `${event.time} ${event.title}` : event.title;
-            eventDot.title = event.title;
+            eventDot.textContent = todo.time ? `${todo.time} ${todo.title}` : todo.title;
+            eventDot.title = todo.title;
+            // ★新機能：クリックイベントを追加
+            eventDot.onclick = (e) => {
+                e.stopPropagation(); // カレンダーセルのクリックイベントを防ぐ
+                openEventDetailModal(todo.id);
+            };
             eventsContainer.appendChild(eventDot);
         });
         dayEl.appendChild(eventsContainer);
@@ -572,11 +592,13 @@ function createCalendarDay(day, isOtherMonth, year, month) {
     return dayEl;
 }
 
+// ★修正：mapに todo.id を追加
 function getTodosForDate(dateStr) {
     return todos.filter(todo => {
         if (!todo.dueDate) return false;
         return todo.dueDate === dateStr;
     }).map(todo => ({
+        id: todo.id, // ★IDを追加
         title: todo.title,
         time: todo.time || null,
         isGarbage: false
@@ -960,10 +982,9 @@ function closeGarbageModal() {
     document.getElementById('garbageModal').classList.remove('active');
 }
 
-// ★新機能：ルールを分かりやすい日本語にフォーマットする
+// ルールを分かりやすい日本語にフォーマットする
 function formatGarbageRule(rule) {
     const dateObj = new Date(rule.startDate + 'T00:00:00');
-    // 'short'だと (日) などになるため 'narrow' (日) に変更
     const dayName = dateObj.toLocaleDateString('ja-JP', { weekday: 'narrow' }); 
     const day = dateObj.getDate();
     const week = Math.floor((day - 1) / 7) + 1;
@@ -983,7 +1004,7 @@ function formatGarbageRule(rule) {
         case 'monthly-day':
             repeatText = `[毎月 第${week} ${dayName}曜]`;
             break;
-        // ★新機能：追加ルール
+        // 追加ルール
         case 'weekly-tue-fri':
             repeatText = '[毎週 火・金曜]';
             break;
@@ -1015,7 +1036,7 @@ function formatGarbageRule(rule) {
 }
 
 
-// ★バグ修正：保存ロジック（重複チェック＆閉じる）
+// 保存ロジック（重複チェック＆閉じる）
 function saveGarbageEvent() {
     const type = document.getElementById('garbageType').value;
     const repeatType = document.getElementById('garbageRepeatType').value;
@@ -1033,7 +1054,7 @@ function saveGarbageEvent() {
         startDate: dateStr
     };
 
-    // ★重複チェック
+    // 重複チェック
     const ruleString = formatGarbageRule(newGarbageEvent);
     const isDuplicate = garbageDays.some(rule => formatGarbageRule(rule) === ruleString);
 
@@ -1045,10 +1066,10 @@ function saveGarbageEvent() {
     garbageDays.push(newGarbageEvent);
     saveGarbageDays();
     renderCalendar();
-    closeGarbageModal(); // ★バグ修正：保存したら閉じる
+    closeGarbageModal(); // 保存したら閉じる
 }
 
-// ★機能追加：新しい繰り返しルールを判定
+// 新しい繰り返しルールを判定
 function getGarbageEventsForDate(dateStr, dateObj) {
     const events = [];
     
@@ -1084,7 +1105,7 @@ function getGarbageEventsForDate(dateStr, dateObj) {
                 if (dayOfWeek === startDayOfWeek && weekOfMonth === startWeekOfMonth) match = true;
                 break;
             
-            // ★新機能：追加ルール
+            // 追加ルール
             case 'weekly-tue-fri': // 毎週 火・金曜日
                 if (dayOfWeek === 2 || dayOfWeek === 5) match = true;
                 break;
@@ -1159,6 +1180,44 @@ function deleteGarbageRule(ruleId) {
         renderCalendar(); // カレンダーを再描画
         renderGarbageRuleList(); // モーダル内のリストも再描画
     }
+}
+
+
+/* ========================================
+   ★新機能：イベント詳細モーダル
+   ======================================== */
+function openEventDetailModal(todoId) {
+    const todo = todos.find(t => t.id === todoId);
+    if (!todo) return;
+
+    currentDetailTodoId = todo.id; // 編集ボタン用にIDを保存
+
+    document.getElementById('detailTitle').textContent = todo.title || '（タイトルなし）';
+    
+    let dateTime = todo.dueDate || '';
+    if (todo.time) {
+        dateTime += ` ${todo.time}`;
+    }
+    document.getElementById('detailDateTime').textContent = dateTime || '（日時未設定）';
+    
+    document.getElementById('detailGroup').textContent = todo.group || '（グループなし）';
+    
+    // メモ欄（URLを自動でリンクに変換）
+    const notesText = todo.notes || '（メモなし）';
+    document.getElementById('detailNotes').innerHTML = convertURLsToLinks(notesText);
+
+    document.getElementById('eventDetailModal').classList.add('active');
+}
+
+function closeEventDetailModal() {
+    document.getElementById('eventDetailModal').classList.remove('active');
+    currentDetailTodoId = null;
+}
+
+// メモ欄のURLをリンクに変換するヘルパー関数
+function convertURLsToLinks(text) {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    return text.replace(urlRegex, '<a href="$1" target="_blank">$1</a>');
 }
 
 
