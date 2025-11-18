@@ -389,7 +389,7 @@ body {
 }
 
 .quick-links a {
-    display: inline-flex; /* ★ 修正 */
+    display: inline-flex; 
     align-items: center;
     gap: var(--spacing-xs);
     padding: 0.5rem 0.8rem;
@@ -410,9 +410,8 @@ body {
     border-color: var(--neon-blue);
 }
 
-/* ★新機能：SVGアイコンの基本スタイル */
 .quick-link-svg {
-    width: 1em; /* テキストのフォントサイズに合わせる */
+    width: 1em; 
     height: 1em;
 }
 
@@ -430,11 +429,8 @@ body {
 .quick-links a[data-icon="ai-pass"] i { color: #f0c30e; }
 .quick-links a[data-icon="ga"] i { color: #E8710A; }
 .quick-links a[data-icon="ads"] i { color: #4285F4; }
-/* ★修正：Geminiのアイコン色 (SVGのfillを対象) */
-.quick-links a[data-icon="gemini"] .quick-link-svg path { 
-    fill: var(--neon-green); 
-}
-.quick-links a[data-icon="manus"] i { color: #FF6B6B; } /* ★追加 */
+.quick-links a[data-icon="gemini"] .quick-link-svg path { fill: var(--neon-green); }
+.quick-links a[data-icon="manus"] i { color: #FF6B6B; } 
 .quick-links a[data-icon="notebooklm"] i { color: #B468EA; } 
 
 
