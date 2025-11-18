@@ -1,5 +1,5 @@
 /* ========================================
-   Zepome's Portal - V14 Script (Full Recovery)
+   Zepome's Portal - V11 Script
    ======================================== */
 
 // グローバル変数
@@ -19,7 +19,7 @@ let isTimerRunning = false;
 let isStopwatchRunning = false;
 let editingTodoId = null; // 編集中のTodo ID
 let currentSortFilter = 'all'; // 現在のソートフィルター
-let currentDetailTodoId = null; // 詳細モーダルで表示中のID
+let currentDetailTodoId = null; // ★新機能：詳細モーダルで表示中のID
 
 // データストレージ
 let spreadsheets = JSON.parse(localStorage.getItem(STORAGE_KEYS.SPREADSHEETS) || '[]');
@@ -51,11 +51,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (gmailCountEl) {
             // Gmailアイコンのクリック動作
             gmailCountEl.addEventListener('click', (e) => {
-                if (!accessToken) { 
-                    e.preventDefault(); 
+                if (!accessToken) { // もし認証トークンがまだ無いなら
+                    e.preventDefault(); // リンクを無効化
                     console.log('Starting authentication...');
-                    handleAuthClick(); 
+                    handleAuthClick(); // 認証を開始
                 }
+                // 認証トークンが既にある場合は、preventDefault() を呼ばないので、
+                // HTMLの <a href="..." target="_blank"> のデフォルト動作（Gmailを開く）が実行される
             });
         }
     }
@@ -85,12 +87,14 @@ function updateCurrentTime() {
         second: '2-digit'
     });
     
+    // 曜日の（）の前に半角スペースを追加
     const dateStringWithWeekday = now.toLocaleDateString('ja-JP', {
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
         weekday: 'short'
     });
+    // "2025/11/15(土)" を "2025/11/15 (土)" に置換
     const dateString = dateStringWithWeekday.replace('(', ' (').replace(/\//g, '/');
     
     const timeDisplay = document.getElementById('timeDisplay');
@@ -195,28 +199,17 @@ function setupEventListeners() {
     document.getElementById('cancelSheet').addEventListener('click', closeSheetModal);
     document.getElementById('saveSheet').addEventListener('click', saveSpreadsheet);
     
-    // イベント詳細モーダル
-    const closeDetailBtn = document.getElementById('closeEventDetailModal');
-    if(closeDetailBtn) closeDetailBtn.addEventListener('click', closeEventDetailModal);
-    
-    const detailModal = document.getElementById('eventDetailModal');
-    if(detailModal) {
-        detailModal.addEventListener('click', (e) => {
-            if (e.target.id === 'eventDetailModal') closeEventDetailModal();
-        });
-    }
-    
-    // 編集ボタンクリック時
-    const editBtn = document.getElementById('editEventBtn');
-    if(editBtn) {
-        editBtn.addEventListener('click', () => {
-            if (currentDetailTodoId) {
-                const idToEdit = currentDetailTodoId; 
-                closeEventDetailModal(); 
-                openTodoModal(idToEdit); 
-            }
-        });
-    }
+    // ★新機能：イベント詳細モーダル
+    document.getElementById('closeEventDetailModal').addEventListener('click', closeEventDetailModal);
+    document.getElementById('eventDetailModal').addEventListener('click', (e) => {
+        if (e.target.id === 'eventDetailModal') closeEventDetailModal();
+    });
+    document.getElementById('editEventBtn').addEventListener('click', () => {
+        if (currentDetailTodoId) {
+            closeEventDetailModal();
+            openTodoModal(currentDetailTodoId); // 編集モーダルを開く
+        }
+    });
 
     // モーダル外クリックで閉じる
     document.getElementById('todoModal').addEventListener('click', (e) => {
@@ -577,18 +570,19 @@ function createCalendarDay(day, isOtherMonth, year, month) {
         dayEl.appendChild(addBtn);
     }
     
+    // ★修正：Todoイベントを取得（IDも）
     const dayTodos = getTodosForDate(dateStr);
     
     if (dayTodos.length > 0) {
         const eventsContainer = document.createElement('div');
         eventsContainer.className = 'day-events';
-        // クリックで詳細モーダルを開く
+        // ★修正：クリックで詳細モーダルを開く
         dayTodos.forEach(todo => {
             const eventDot = document.createElement('div');
             eventDot.className = 'event-dot';
             eventDot.textContent = todo.time ? `${todo.time} ${todo.title}` : todo.title;
             eventDot.title = todo.title;
-            // クリックイベントを追加
+            // ★新機能：クリックイベントを追加
             eventDot.onclick = (e) => {
                 e.stopPropagation(); // カレンダーセルのクリックイベントを防ぐ
                 openEventDetailModal(todo.id);
@@ -601,12 +595,13 @@ function createCalendarDay(day, isOtherMonth, year, month) {
     return dayEl;
 }
 
+// ★修正：mapに todo.id を追加
 function getTodosForDate(dateStr) {
     return todos.filter(todo => {
         if (!todo.dueDate) return false;
         return todo.dueDate === dateStr;
     }).map(todo => ({
-        id: todo.id, 
+        id: todo.id, // ★IDを追加
         title: todo.title,
         time: todo.time || null,
         isGarbage: false
@@ -1192,13 +1187,13 @@ function deleteGarbageRule(ruleId) {
 
 
 /* ========================================
-   イベント詳細モーダル
+   ★新機能：イベント詳細モーダル
    ======================================== */
 function openEventDetailModal(todoId) {
     const todo = todos.find(t => t.id === todoId);
     if (!todo) return;
 
-    currentDetailTodoId = todo.id; // IDを保存
+    currentDetailTodoId = todo.id; // ★IDを保存
 
     document.getElementById('detailTitle').textContent = todo.title || '（タイトルなし）';
     
@@ -1219,7 +1214,7 @@ function openEventDetailModal(todoId) {
 
 function closeEventDetailModal() {
     document.getElementById('eventDetailModal').classList.remove('active');
-    currentDetailTodoId = null; 
+    currentDetailTodoId = null; // ★ここでリセットされる
 }
 
 // メモ欄のURLをリンクに変換するヘルパー関数
