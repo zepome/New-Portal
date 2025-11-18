@@ -1,5 +1,5 @@
 /* ========================================
-   Zepome's Portal - V11 Script
+   Zepome's Portal - V16 Script (Edit Logic Fix)
    ======================================== */
 
 // グローバル変数
@@ -19,7 +19,7 @@ let isTimerRunning = false;
 let isStopwatchRunning = false;
 let editingTodoId = null; // 編集中のTodo ID
 let currentSortFilter = 'all'; // 現在のソートフィルター
-let currentDetailTodoId = null; // ★新機能：詳細モーダルで表示中のID
+let currentDetailTodoId = null; // 詳細モーダルで表示中のID
 
 // データストレージ
 let spreadsheets = JSON.parse(localStorage.getItem(STORAGE_KEYS.SPREADSHEETS) || '[]');
@@ -51,13 +51,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (gmailCountEl) {
             // Gmailアイコンのクリック動作
             gmailCountEl.addEventListener('click', (e) => {
-                if (!accessToken) { // もし認証トークンがまだ無いなら
-                    e.preventDefault(); // リンクを無効化
+                if (!accessToken) { 
+                    e.preventDefault(); 
                     console.log('Starting authentication...');
-                    handleAuthClick(); // 認証を開始
+                    handleAuthClick(); 
                 }
-                // 認証トークンが既にある場合は、preventDefault() を呼ばないので、
-                // HTMLの <a href="..." target="_blank"> のデフォルト動作（Gmailを開く）が実行される
             });
         }
     }
@@ -87,14 +85,12 @@ function updateCurrentTime() {
         second: '2-digit'
     });
     
-    // 曜日の（）の前に半角スペースを追加
     const dateStringWithWeekday = now.toLocaleDateString('ja-JP', {
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
         weekday: 'short'
     });
-    // "2025/11/15(土)" を "2025/11/15 (土)" に置換
     const dateString = dateStringWithWeekday.replace('(', ' (').replace(/\//g, '/');
     
     const timeDisplay = document.getElementById('timeDisplay');
@@ -199,17 +195,29 @@ function setupEventListeners() {
     document.getElementById('cancelSheet').addEventListener('click', closeSheetModal);
     document.getElementById('saveSheet').addEventListener('click', saveSpreadsheet);
     
-    // ★新機能：イベント詳細モーダル
-    document.getElementById('closeEventDetailModal').addEventListener('click', closeEventDetailModal);
-    document.getElementById('eventDetailModal').addEventListener('click', (e) => {
-        if (e.target.id === 'eventDetailModal') closeEventDetailModal();
-    });
-    document.getElementById('editEventBtn').addEventListener('click', () => {
-        if (currentDetailTodoId) {
-            closeEventDetailModal();
-            openTodoModal(currentDetailTodoId); // 編集モーダルを開く
-        }
-    });
+    // イベント詳細モーダル
+    const closeDetailBtn = document.getElementById('closeEventDetailModal');
+    if(closeDetailBtn) closeDetailBtn.addEventListener('click', closeEventDetailModal);
+    
+    const detailModal = document.getElementById('eventDetailModal');
+    if(detailModal) {
+        detailModal.addEventListener('click', (e) => {
+            if (e.target.id === 'eventDetailModal') closeEventDetailModal();
+        });
+    }
+    
+    // ★バグ修正：編集ボタンクリック時、IDを確実に確保して処理する
+    const editBtn = document.getElementById('editEventBtn');
+    if(editBtn) {
+        // onclickに割り当てることで多重登録を防ぐ
+        editBtn.onclick = () => {
+            if (currentDetailTodoId) {
+                const idToEdit = currentDetailTodoId; // IDを退避
+                closeEventDetailModal(); 
+                openTodoModal(idToEdit); // 退避したIDで開く
+            }
+        };
+    }
 
     // モーダル外クリックで閉じる
     document.getElementById('todoModal').addEventListener('click', (e) => {
@@ -570,22 +578,21 @@ function createCalendarDay(day, isOtherMonth, year, month) {
         dayEl.appendChild(addBtn);
     }
     
-    // ★修正：Todoイベントを取得（IDも）
+    // Todoイベントを取得
     const dayTodos = getTodosForDate(dateStr);
     
     if (dayTodos.length > 0) {
         const eventsContainer = document.createElement('div');
         eventsContainer.className = 'day-events';
-        // ★修正：クリックで詳細モーダルを開く
+        // クリックで詳細モーダルを開く
         dayTodos.forEach(todo => {
             const eventDot = document.createElement('div');
             eventDot.className = 'event-dot';
             eventDot.textContent = todo.time ? `${todo.time} ${todo.title}` : todo.title;
             eventDot.title = todo.title;
-            // ★新機能：クリックイベントを追加
             eventDot.onclick = (e) => {
-                e.stopPropagation(); // カレンダーセルのクリックイベントを防ぐ
-                openEventDetailModal(todo.id);
+                e.stopPropagation(); 
+                openEventDetailModal(todo.id); // IDを渡す
             };
             eventsContainer.appendChild(eventDot);
         });
@@ -595,13 +602,12 @@ function createCalendarDay(day, isOtherMonth, year, month) {
     return dayEl;
 }
 
-// ★修正：mapに todo.id を追加
 function getTodosForDate(dateStr) {
     return todos.filter(todo => {
         if (!todo.dueDate) return false;
         return todo.dueDate === dateStr;
     }).map(todo => ({
-        id: todo.id, // ★IDを追加
+        id: todo.id, // IDを保持
         title: todo.title,
         time: todo.time || null,
         isGarbage: false
@@ -629,10 +635,18 @@ function openTodoModalWithDate(dateStr) {
 function openTodoModal(todoId = null) {
     editingTodoId = todoId;
     
+    // ★修正：まずグループオプションを更新してから値をセットする
+    updateTodoGroupOptions();
+    
     if (todoId) {
         // 編集モード
-        const todo = todos.find(t => t.id === todoId);
+        // ★修正：IDは数値だが念のため緩やかな一致(==)を使う
+        const todo = todos.find(t => t.id == todoId);
         if (todo) {
+            // タイトル変更（HTMLにIDがないのでquerySelectorで検索）
+            const titleEl = document.querySelector('#todoModal h3');
+            if(titleEl) titleEl.innerHTML = '<i class="fas fa-tasks"></i> Todoを編集';
+
             document.getElementById('todoTitle').value = todo.title;
             document.getElementById('todoGroup').value = todo.group || '';
             document.getElementById('todoDueDate').value = todo.dueDate || '';
@@ -641,16 +655,25 @@ function openTodoModal(todoId = null) {
             
             document.getElementById('saveTodo').style.display = 'none';
             document.getElementById('updateTodo').style.display = 'inline-block';
+        } else {
+            // IDがあるのに見つからない場合は新規モード扱い（安全策）
+             const titleEl = document.querySelector('#todoModal h3');
+             if(titleEl) titleEl.innerHTML = '<i class="fas fa-tasks"></i> Todoを追加';
+             clearTodoForm();
+             document.getElementById('saveTodo').style.display = 'inline-block';
+             document.getElementById('updateTodo').style.display = 'none';
         }
     } else {
         // 新規作成モード
+        const titleEl = document.querySelector('#todoModal h3');
+        if(titleEl) titleEl.innerHTML = '<i class="fas fa-tasks"></i> Todoを追加';
+        
         clearTodoForm();
         document.getElementById('saveTodo').style.display = 'inline-block';
         document.getElementById('updateTodo').style.display = 'none';
     }
     
     document.getElementById('todoModal').classList.add('active');
-    updateTodoGroupOptions();
 }
 
 function closeTodoModal() {
@@ -733,7 +756,7 @@ function saveTodo() {
 function updateTodo() {
     if (!editingTodoId) return;
     
-    const todo = todos.find(t => t.id === editingTodoId);
+    const todo = todos.find(t => t.id == editingTodoId);
     if (!todo) return;
     
     const title = document.getElementById('todoTitle').value.trim();
@@ -974,7 +997,6 @@ function deleteGroup(groupName) {
    ゴミの日カレンダー
    ======================================== */
 
-// モーダルを開くときに、ルール一覧も描画
 function openGarbageModal() {
     document.getElementById('garbageDate').value = new Date().toISOString().split('T')[0];
     renderGarbageRuleList(); // ルール一覧を描画
@@ -985,7 +1007,6 @@ function closeGarbageModal() {
     document.getElementById('garbageModal').classList.remove('active');
 }
 
-// ルールを分かりやすい日本語にフォーマットする
 function formatGarbageRule(rule) {
     const dateObj = new Date(rule.startDate + 'T00:00:00');
     const dayName = dateObj.toLocaleDateString('ja-JP', { weekday: 'narrow' }); 
@@ -1007,7 +1028,6 @@ function formatGarbageRule(rule) {
         case 'monthly-day':
             repeatText = `[毎月 第${week} ${dayName}曜]`;
             break;
-        // 追加ルール
         case 'weekly-tue-fri':
             repeatText = '[毎週 火・金曜]';
             break;
@@ -1039,7 +1059,6 @@ function formatGarbageRule(rule) {
 }
 
 
-// 保存ロジック（重複チェック＆閉じる）
 function saveGarbageEvent() {
     const type = document.getElementById('garbageType').value;
     const repeatType = document.getElementById('garbageRepeatType').value;
@@ -1057,30 +1076,28 @@ function saveGarbageEvent() {
         startDate: dateStr
     };
 
-    // 重複チェック
     const ruleString = formatGarbageRule(newGarbageEvent);
     const isDuplicate = garbageDays.some(rule => formatGarbageRule(rule) === ruleString);
 
     if (isDuplicate) {
         alert('同じ設定のルールが既に存在します：\n' + ruleString);
-        return; // 追加しない
+        return; 
     }
 
     garbageDays.push(newGarbageEvent);
     saveGarbageDays();
     renderCalendar();
-    closeGarbageModal(); // 保存したら閉じる
+    closeGarbageModal(); 
 }
 
-// 新しい繰り返しルールを判定
 function getGarbageEventsForDate(dateStr, dateObj) {
     const events = [];
     
     const year = dateObj.getFullYear();
-    const month = dateObj.getMonth(); // 0-11
-    const date = dateObj.getDate(); // 1-31
-    const dayOfWeek = dateObj.getDay(); // 0=日, 1=月, 2=火, 3=水, 4=木, 5=金, 6=土
-    const weekOfMonth = Math.floor((date - 1) / 7) + 1; // 1-5
+    const month = dateObj.getMonth(); 
+    const date = dateObj.getDate(); 
+    const dayOfWeek = dateObj.getDay(); 
+    const weekOfMonth = Math.floor((date - 1) / 7) + 1; 
 
     garbageDays.forEach(event => {
         const startDate = new Date(event.startDate + 'T00:00:00'); 
@@ -1107,30 +1124,28 @@ function getGarbageEventsForDate(dateStr, dateObj) {
             case 'monthly-day':
                 if (dayOfWeek === startDayOfWeek && weekOfMonth === startWeekOfMonth) match = true;
                 break;
-            
-            // 追加ルール
-            case 'weekly-tue-fri': // 毎週 火・金曜日
+            case 'weekly-tue-fri': 
                 if (dayOfWeek === 2 || dayOfWeek === 5) match = true;
                 break;
-            case 'monthly-1-wed': // 毎月 第1 水曜日
+            case 'monthly-1-wed': 
                 if (dayOfWeek === 3 && weekOfMonth === 1) match = true;
                 break;
-            case 'monthly-1-3-mon': // 毎月 第1・第3 月曜日
+            case 'monthly-1-3-mon': 
                 if (dayOfWeek === 1 && (weekOfMonth === 1 || weekOfMonth === 3)) match = true;
                 break;
-            case 'monthly-2-thu': // 毎月 第2 木曜日
+            case 'monthly-2-thu': 
                 if (dayOfWeek === 4 && weekOfMonth === 2) match = true;
                 break;
-            case 'monthly-2-4-5-mon': // 毎月 第2・第4・第5 月曜日
+            case 'monthly-2-4-5-mon': 
                 if (dayOfWeek === 1 && (weekOfMonth === 2 || weekOfMonth === 4 || weekOfMonth === 5)) match = true;
                 break;
-            case 'monthly-3-wed': // 毎月 第3 水曜日
+            case 'monthly-3-wed': 
                 if (dayOfWeek === 3 && weekOfMonth === 3) match = true;
                 break;
-            case 'monthly-3-thu': // 毎月 第3 木曜日
+            case 'monthly-3-thu': 
                 if (dayOfWeek === 4 && weekOfMonth === 3) match = true;
                 break;
-            case 'monthly-4-thu': // 毎月 第4 木曜日
+            case 'monthly-4-thu': 
                 if (dayOfWeek === 4 && weekOfMonth === 4) match = true;
                 break;
         }
@@ -1147,10 +1162,9 @@ function getGarbageEventsForDate(dateStr, dateObj) {
     return events;
 }
 
-// ゴミの日ルール一覧をモーダル内に描画する
 function renderGarbageRuleList() {
     const container = document.getElementById('garbageRuleListContainer');
-    container.innerHTML = ''; // 初期化
+    container.innerHTML = ''; 
 
     if (garbageDays.length === 0) {
         container.innerHTML = '<h3>現在のルール</h3><p>設定済みのルールはありません</p>';
@@ -1172,7 +1186,6 @@ function renderGarbageRuleList() {
     container.innerHTML = html;
 }
 
-// ゴミの日ルールを削除する
 function deleteGarbageRule(ruleId) {
     const rule = garbageDays.find(r => r.id === ruleId);
     if (!rule) return;
@@ -1180,20 +1193,20 @@ function deleteGarbageRule(ruleId) {
     if (confirm(`このルールを削除しますか？\n「${formatGarbageRule(rule)}」`)) {
         garbageDays = garbageDays.filter(r => r.id !== ruleId);
         saveGarbageDays();
-        renderCalendar(); // カレンダーを再描画
-        renderGarbageRuleList(); // モーダル内のリストも再描画
+        renderCalendar(); 
+        renderGarbageRuleList(); 
     }
 }
 
 
 /* ========================================
-   ★新機能：イベント詳細モーダル
+   イベント詳細モーダル
    ======================================== */
 function openEventDetailModal(todoId) {
     const todo = todos.find(t => t.id === todoId);
     if (!todo) return;
 
-    currentDetailTodoId = todo.id; // ★IDを保存
+    currentDetailTodoId = todo.id; // IDを保存
 
     document.getElementById('detailTitle').textContent = todo.title || '（タイトルなし）';
     
@@ -1205,7 +1218,6 @@ function openEventDetailModal(todoId) {
     
     document.getElementById('detailGroup').textContent = todo.group || '（グループなし）';
     
-    // メモ欄（URLを自動でリンクに変換）
     const notesText = todo.notes || '（メモなし）';
     document.getElementById('detailNotes').innerHTML = convertURLsToLinks(notesText);
 
@@ -1214,10 +1226,9 @@ function openEventDetailModal(todoId) {
 
 function closeEventDetailModal() {
     document.getElementById('eventDetailModal').classList.remove('active');
-    currentDetailTodoId = null; // ★ここでリセットされる
+    currentDetailTodoId = null; 
 }
 
-// メモ欄のURLをリンクに変換するヘルパー関数
 function convertURLsToLinks(text) {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     return text.replace(urlRegex, '<a href="$1" target="_blank">$1</a>');
