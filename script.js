@@ -1,5 +1,5 @@
 /* ========================================
-   Zepome's Portal - V16 Script (Edit Logic Fix)
+   Zepome's Portal - V17 Script (Stable Fix)
    ======================================== */
 
 // グローバル変数
@@ -590,9 +590,10 @@ function createCalendarDay(day, isOtherMonth, year, month) {
             eventDot.className = 'event-dot';
             eventDot.textContent = todo.time ? `${todo.time} ${todo.title}` : todo.title;
             eventDot.title = todo.title;
+            // クリックイベントを追加
             eventDot.onclick = (e) => {
-                e.stopPropagation(); 
-                openEventDetailModal(todo.id); // IDを渡す
+                e.stopPropagation(); // カレンダーセルのクリックイベントを防ぐ
+                openEventDetailModal(todo.id);
             };
             eventsContainer.appendChild(eventDot);
         });
@@ -602,12 +603,13 @@ function createCalendarDay(day, isOtherMonth, year, month) {
     return dayEl;
 }
 
+// ★修正：mapに todo.id を追加
 function getTodosForDate(dateStr) {
     return todos.filter(todo => {
         if (!todo.dueDate) return false;
         return todo.dueDate === dateStr;
     }).map(todo => ({
-        id: todo.id, // IDを保持
+        id: todo.id, // ★IDを追加
         title: todo.title,
         time: todo.time || null,
         isGarbage: false
@@ -997,6 +999,7 @@ function deleteGroup(groupName) {
    ゴミの日カレンダー
    ======================================== */
 
+// モーダルを開くときに、ルール一覧も描画
 function openGarbageModal() {
     document.getElementById('garbageDate').value = new Date().toISOString().split('T')[0];
     renderGarbageRuleList(); // ルール一覧を描画
@@ -1007,6 +1010,7 @@ function closeGarbageModal() {
     document.getElementById('garbageModal').classList.remove('active');
 }
 
+// ルールを分かりやすい日本語にフォーマットする
 function formatGarbageRule(rule) {
     const dateObj = new Date(rule.startDate + 'T00:00:00');
     const dayName = dateObj.toLocaleDateString('ja-JP', { weekday: 'narrow' }); 
@@ -1028,6 +1032,7 @@ function formatGarbageRule(rule) {
         case 'monthly-day':
             repeatText = `[毎月 第${week} ${dayName}曜]`;
             break;
+        // 追加ルール
         case 'weekly-tue-fri':
             repeatText = '[毎週 火・金曜]';
             break;
@@ -1059,6 +1064,7 @@ function formatGarbageRule(rule) {
 }
 
 
+// 保存ロジック（重複チェック＆閉じる）
 function saveGarbageEvent() {
     const type = document.getElementById('garbageType').value;
     const repeatType = document.getElementById('garbageRepeatType').value;
@@ -1076,28 +1082,30 @@ function saveGarbageEvent() {
         startDate: dateStr
     };
 
+    // 重複チェック
     const ruleString = formatGarbageRule(newGarbageEvent);
     const isDuplicate = garbageDays.some(rule => formatGarbageRule(rule) === ruleString);
 
     if (isDuplicate) {
         alert('同じ設定のルールが既に存在します：\n' + ruleString);
-        return; 
+        return; // 追加しない
     }
 
     garbageDays.push(newGarbageEvent);
     saveGarbageDays();
     renderCalendar();
-    closeGarbageModal(); 
+    closeGarbageModal(); // 保存したら閉じる
 }
 
+// 新しい繰り返しルールを判定
 function getGarbageEventsForDate(dateStr, dateObj) {
     const events = [];
     
     const year = dateObj.getFullYear();
-    const month = dateObj.getMonth(); 
-    const date = dateObj.getDate(); 
-    const dayOfWeek = dateObj.getDay(); 
-    const weekOfMonth = Math.floor((date - 1) / 7) + 1; 
+    const month = dateObj.getMonth(); // 0-11
+    const date = dateObj.getDate(); // 1-31
+    const dayOfWeek = dateObj.getDay(); // 0=日, 1=月, 2=火, 3=水, 4=木, 5=金, 6=土
+    const weekOfMonth = Math.floor((date - 1) / 7) + 1; // 1-5
 
     garbageDays.forEach(event => {
         const startDate = new Date(event.startDate + 'T00:00:00'); 
@@ -1124,28 +1132,30 @@ function getGarbageEventsForDate(dateStr, dateObj) {
             case 'monthly-day':
                 if (dayOfWeek === startDayOfWeek && weekOfMonth === startWeekOfMonth) match = true;
                 break;
-            case 'weekly-tue-fri': 
+            
+            // 追加ルール
+            case 'weekly-tue-fri': // 毎週 火・金曜日
                 if (dayOfWeek === 2 || dayOfWeek === 5) match = true;
                 break;
-            case 'monthly-1-wed': 
+            case 'monthly-1-wed': // 毎月 第1 水曜日
                 if (dayOfWeek === 3 && weekOfMonth === 1) match = true;
                 break;
-            case 'monthly-1-3-mon': 
+            case 'monthly-1-3-mon': // 毎月 第1・第3 月曜日
                 if (dayOfWeek === 1 && (weekOfMonth === 1 || weekOfMonth === 3)) match = true;
                 break;
-            case 'monthly-2-thu': 
+            case 'monthly-2-thu': // 毎月 第2 木曜日
                 if (dayOfWeek === 4 && weekOfMonth === 2) match = true;
                 break;
-            case 'monthly-2-4-5-mon': 
+            case 'monthly-2-4-5-mon': // 毎月 第2・第4・第5 月曜日
                 if (dayOfWeek === 1 && (weekOfMonth === 2 || weekOfMonth === 4 || weekOfMonth === 5)) match = true;
                 break;
-            case 'monthly-3-wed': 
+            case 'monthly-3-wed': // 毎月 第3 水曜日
                 if (dayOfWeek === 3 && weekOfMonth === 3) match = true;
                 break;
-            case 'monthly-3-thu': 
+            case 'monthly-3-thu': // 毎月 第3 木曜日
                 if (dayOfWeek === 4 && weekOfMonth === 3) match = true;
                 break;
-            case 'monthly-4-thu': 
+            case 'monthly-4-thu': // 毎月 第4 木曜日
                 if (dayOfWeek === 4 && weekOfMonth === 4) match = true;
                 break;
         }
@@ -1162,9 +1172,10 @@ function getGarbageEventsForDate(dateStr, dateObj) {
     return events;
 }
 
+// ゴミの日ルール一覧をモーダル内に描画する
 function renderGarbageRuleList() {
     const container = document.getElementById('garbageRuleListContainer');
-    container.innerHTML = ''; 
+    container.innerHTML = ''; // 初期化
 
     if (garbageDays.length === 0) {
         container.innerHTML = '<h3>現在のルール</h3><p>設定済みのルールはありません</p>';
@@ -1186,6 +1197,7 @@ function renderGarbageRuleList() {
     container.innerHTML = html;
 }
 
+// ゴミの日ルールを削除する
 function deleteGarbageRule(ruleId) {
     const rule = garbageDays.find(r => r.id === ruleId);
     if (!rule) return;
@@ -1193,8 +1205,8 @@ function deleteGarbageRule(ruleId) {
     if (confirm(`このルールを削除しますか？\n「${formatGarbageRule(rule)}」`)) {
         garbageDays = garbageDays.filter(r => r.id !== ruleId);
         saveGarbageDays();
-        renderCalendar(); 
-        renderGarbageRuleList(); 
+        renderCalendar(); // カレンダーを再描画
+        renderGarbageRuleList(); // モーダル内のリストも再描画
     }
 }
 
